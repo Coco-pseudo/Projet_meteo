@@ -6,6 +6,9 @@
 // to do list: creer fonction equilibrage d'avl, finir creation fils, finir creation arbre, finir le projet :)
 // verifier si lors de l'equilibre, il faut que avoir acces au parent du noeud pour certaines rotations
 // verifier les fonctions de calcul d'équilibre
+//commencer a chercher comment extraire les données du fichier pour l'incrémenter et faire le tri
+//chercher comment creer un fichier de sorti
+//mettre a jour le projet.h
 typedef int type;
 typedef struct arbre {
     struct arbre * fd;
