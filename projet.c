@@ -1,7 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
-//#include <projet.h>
+#include <projet.h>
 
 // to do list: creer fonction equilibrage d'avl, finir creation fils, finir creation arbre, finir le projet :)
 // verifier si lors de l'equilibre, il faut que avoir acces au parent du noeud pour certaines rotations
