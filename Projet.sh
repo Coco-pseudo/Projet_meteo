@@ -5,21 +5,18 @@ while getopts ":t:p:whmFGSAOQd-:f:" opt
 do
     case $opt in
         t) 
-        t=1
         i=$OPTARG 
-        if [ -z "$i" ]
-        then
-            echo "Sélectionner un mode de sélection des températures"
-        fi 
         case $i in 
-            1)  #min/max/moy   
-            t1=1 
+            1)  #min/max/moy   #il faut garder les colonnes 1 et 11 (num balise + temp)
+            t=1     
             ;;
             2) 
+            t=2
             ;;
             3) 
+            t=3
             ;;
-            *) 
+            *) echo "Mode inconnu/manquant "
             exit 1
             ;;  
         esac
@@ -29,18 +26,17 @@ do
         p) echo "Option pression"
         p=1
         j=$OPTARG 
-        if [ -z "$j" ]
-        then
-            echo "Sélectionner un mode de sélection des pressions"
-        fi 
         case $j in 
-            1) echo "Mode 1"
+            1) 
+            p=1
             ;;
-            2) echo "Mode 2"
+            2) 
+            p=2
             ;;
-            3) echo "Mode 3"
+            3) 
+            p=3
             ;;
-            *) echo "Mode inconnue" 
+            *) echo "Mode inconnu/manquant" 
             exit 1   
         esac
 
@@ -77,7 +73,7 @@ do
         ;;
         -)
         case ${OPTARG} in
-            Tab) echo "Option Tab"
+            tab) echo "Option Tab"
             T=1
             ;;
             abr) echo "Option abr"
@@ -94,7 +90,7 @@ do
         esac
 
         ;;
-        f) echo "fichier"
+        f) #echo "fichier"
 
         f=1
         I=$OPTARG
@@ -108,7 +104,7 @@ do
         help) echo "Option help"
 
         ;;
-        :) echo "L'option $OPTARG nécessite un argument (mode, nom de fichier)"
+        :) echo "L'option $OPTARG nécessite un argument (mode/nom de fichier)"
         exit 1
         ;;
         
@@ -129,6 +125,7 @@ done
 if [ -z "$f" ]
 then
     echo "Sélectionner l'option fichier (obligatoire)"
+    exit 2
 fi 
 
 
@@ -138,7 +135,7 @@ fi
 #verif presence fichier dans dossier 
 #OK
 
-#traiter les options composées de chaines de caractères --> considérer - comme une option et regarder les arguments ensuite via un autre case 
+#traiter les options composées de chaines de caractères --> considérer - comme une option et regarder les arguments ensuite via un autre case{...}
 #OK
 
 #verif un seul choix parmis AVL,ABR,tab     --> si pas de choix, AVL par défaut
@@ -151,38 +148,71 @@ fi
 
 if [ ! -z "$a" ] && [ ! -z "$A" ]
 then
-    echo "Un seul mode de tri autorisé"
+    echo "Un seul mode de tri autorisé (parmis AVL,ABR,Tab)"
     exit 2
 fi
 if [ ! -z "$a" ] && [ ! -z "$T" ]
 then
-    echo "Un seul mode de tri autorisé"
+    echo "Un seul mode de tri autorisé (parmis AVL,ABR,Tab)"
     exit 2
 fi
 if [ ! -z "$T" ] && [ ! -z "$A" ]
 then
-    echo "Un seul mode de tri autorisé"
+    echo "Un seul mode de tri autorisé (parmis AVL,ABR,Tab)"
     exit 2
 fi
 #verif deux argument pour option date, avec min, max
 
-#verif au moins un parmis t,p,w,h
+#verif au moins un parmis t,p,w,h 
+#ok
 
 if   [ -z "$t" ] && [ -z "$p" ]  && [ -z "$w" ] && [ -z "$h" ]
 then
-   echo "Choisissez au moins une grandeur pour trier les données (température, pression, vent, humidité)"
+   echo "Choisissez au moins une grandeur pour trier les données ( parmis température, pression, vent, humidité)"
+   exit 2
 fi
 
 
 if [ ! -z  "$t1" ] #cas où on est en temperature mode 1
 then
-    echo "température mode 1"
+    echo "température mode 1 "
 
 fi
 
+#tri du doc (garder que info utile)
+#executer programme c
+#affichage gnuplot
+#commande HELP
 
 
 
+case $t in 
+    1)cut -d";" -f1,11 $I > tmp.csv
+    M=1
+    ;;
+    2)cut -d";" -f2,11 $I > tmp.csv
+    M=2
+    ;;
+    3)cut -d";" -f1,2,11 $I > tmp.csv
+    M=3
+    ;;
+    \?)
+    exit 1
+esac
+
+case $p in 
+    1)cut -d";" -f1,7 $I > tmp.csv
+    M=1
+    ;;
+    2)cut -d";" -f2,7 $I > tmp.csv
+    M=2
+    ;;
+    3)cut -d";" -f1,2,7 $I > tmp.csv
+    M=3
+    ;;
+    \?)
+    exit 1
+esac
 
 
 exit 0
