@@ -1,6 +1,6 @@
 #!/bin/bash
 
-while getopts ":t:p:whmFGSAOQd-:f:" opt
+while getopts ":t:p:whmFGSAOQd:-:f:" opt
 
 do
     case $opt in
@@ -16,6 +16,8 @@ do
             3) 
             t=3
             ;;
+            12) echo "coucou"
+            ;;
             *) echo "Mode inconnu/manquant "
             exit 1
             ;;  
@@ -23,7 +25,7 @@ do
 
 
         ;; 
-        p) echo "Option pression"
+        p) 
         p=1
         j=$OPTARG 
         case $j in 
@@ -41,14 +43,14 @@ do
         esac
 
         ;;
-        w) echo "Option de vent"
+        w) 
         w=1
         ;;
-        h) echo "Option altitude"
+        h)
         h=1
         ;;
-        m) echo "Option humidité"
-
+        m) 
+        m=1
         ;;
         F) echo "Option localisation 1"
 
@@ -68,7 +70,10 @@ do
         Q) echo "Option localisation 6"
 
         ;;
-        d) echo "Option date"
+        d) 
+        i=$OPTARG
+        echo $i
+        #grep -q [2][0][0-2][0-9].[0-1][0-9].[0-3][0-9] - [2][0][0-2][0-9].[0-1][0-9].[0-3][0-9] $i
 
         ;;
         -)
@@ -77,10 +82,10 @@ do
             T=1
             ;;
             abr) echo "Option abr"
-            a=1
+            T=2
             ;;
             avl) echo "Option avl"
-            A=1
+            T=1
             ;;
             help) echo "Menu help" 
             exit 2
@@ -98,7 +103,7 @@ do
         then
             echo "Veuillez présicer un nom de fichier valide"
             exit 1
-        fi
+        fi      
 
         ;;
         help) echo "Option help"
@@ -119,14 +124,17 @@ done
 #verif presence option fichier 
 #OK
 
+#verif date si mode 2/3
 
+ 
 
 
 if [ -z "$f" ]
 then
     echo "Sélectionner l'option fichier (obligatoire)"
     exit 2
-fi 
+fi
+
 
 
 
@@ -142,7 +150,8 @@ fi
 #ok
 if   [ -z "$a" ] && [ -z "$A" ]  && [ -z "$T" ]
 then
-   echo "Mode de tri par default : AVL"
+    #tri par defaut : AVL
+    T=3
 fi
 
 
@@ -166,9 +175,9 @@ fi
 #verif au moins un parmis t,p,w,h 
 #ok
 
-if   [ -z "$t" ] && [ -z "$p" ]  && [ -z "$w" ] && [ -z "$h" ]
+if   [ -z "$t" ] && [ -z "$p" ]  && [ -z "$w" ] && [ -z "$m" ] && [ -z "$h" ]
 then
-   echo "Choisissez au moins une grandeur pour trier les données ( parmis température, pression, vent, humidité)"
+   echo "Choisissez au moins une grandeur pour trier les données ( parmis température, pression, vent, humidité, altitude)"
    exit 2
 fi
 
@@ -179,7 +188,8 @@ then
 
 fi
 
-#tri du doc (garder que info utile)
+#tri du doc (garder que infos utiles) in progress
+#option date/localisation
 #executer programme c
 #affichage gnuplot
 #commande HELP
@@ -215,5 +225,29 @@ case $p in
 esac
 
 
+if [ ! -z "$w" ]
+then
+    if [ $w -eq 1 ] 
+    then
+        cut -d";" -f1,4,5  $I > tmp.csv
+    fi
+fi
+
+if [ ! -z "$m" ]
+then
+    if [ $m -eq 1 ] 
+    then
+        cut -d";" -f1,6  $I > tmp.csv
+    fi
+fi
+
+if [ ! -z "$h" ]
+then
+    if [ $h -eq 1 ] 
+    then
+        cut -d";" -f1,14 $I > tmp.csv
+    fi
+fi
+echo "done"
 exit 0
 
