@@ -1,7 +1,4 @@
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
-#include <projet.h>
+#include "projet.h"
 
 // to do list: creer fonction equilibrage d'avl, finir creation fils, finir creation arbre, finir le projet :)
 // verifier si lors de l'equilibre, il faut que avoir acces au parent du noeud pour certaines rotations
@@ -11,7 +8,7 @@
 //mettre a jour le projet.h
 //continuer fonctions d'equilibrage et faire les fcts de pivot
 //rajouter la partie recherche des elements dans le fichier en parametre et creer un fichier qui contiendras les donnees tries
-typedef int type;
+/*typedef int type;
 typedef struct arbre {
     struct arbre * fd;
     struct arbre * fg;
@@ -22,7 +19,7 @@ typedef struct arbre {
 typedef Arbre * pA;
 //a supprimer la liste suivante de prototypes
 int verifEquilibre (pA);
-
+*/
 type absolu (type a){
     return (a>=0 ? a : -a);
 }
@@ -135,7 +132,7 @@ void calculEquilibre (pA a){
 int verifEquilibre (pA a){ //si |equilibre de l'arbre >= 2, modifie 
     if(!estVide(a)){
         if(absolu(a->equilibre >=2)){
-            //faire appel aux fonctions d'equilibrage
+            //faire appel aux fonctions d'equilibrage, (surtouten fonctions des enfants)
 
         }
     }else return 1;
@@ -147,7 +144,7 @@ pA rechercheParentModifEquilibre(pA a, type e){ //dans le cas ou un element est 
                 //modifier l'equilibre
                 a->equilibre = a->equilibre -1;
                 verifEquilibre(a);
-                return rechercheParentModifEquilibre;
+                return rechercheParentModifEquilibre(a->fg, e);
             }else{
                 return a;
             }
