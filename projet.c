@@ -1,3 +1,5 @@
+// station; temperature
+// station; tmpmin; tmpmax; tmpmoyenne;
 #include "projet.h"
 
 // to do list: creer fonction equilibrage d'avl, finir creation fils, finir creation arbre, finir le projet :)
@@ -20,6 +22,7 @@ typedef Arbre * pA;
 //a supprimer la liste suivante de prototypes
 int verifEquilibre (pA);
 */
+//tout remanier pour avoir un tri par moyenne/ min/ max -> bcp moins d'elements
 type absolu (type a){
     return (a>=0 ? a : -a);
 }
@@ -36,7 +39,7 @@ int descendance(pA a){
     }
     return 0;
 }
-pA rechercheParentCreation(pA a, type e){ //dans le cas ou un element est egal a celui que l'on cree, on renvoie sa localisation, sinon c le futur parent.
+pA rechercheParentCreation(pA a, elmt e){ //dans le cas ou un element est egal a celui que l'on cree, on renvoie sa localisation, sinon c le futur parent.
     if(!estVide(a)){
         if(e< a->elmt){
             if(!estVide(a->fg)){
@@ -66,7 +69,7 @@ pA rechercheParentCreation(pA a, type e){ //dans le cas ou un element est egal a
     }
 }
 
-pA rechercheParent(pA a, type e){
+pA rechercheParent(pA a, elmt e){
     if(!estVide(a)){
         if(e< a->elmt){
             if(!estVide(a->fg)){
@@ -137,7 +140,7 @@ int verifEquilibre (pA a){ //si |equilibre de l'arbre >= 2, modifie
         }
     }else return 1;
 }
-pA rechercheParentModifEquilibre(pA a, type e){ //dans le cas ou un element est egal a celui que l'on cree, on renvoie sa localisation, sinon c le futur parent.
+pA rechercheParentModifEquilibre(pA a, elmt e){ //dans le cas ou un element est egal a celui que l'on cree, on renvoie sa localisation, sinon c le futur parent.
     if(!estVide(a)){
         if(e< a->elmt){
             if(!estVide(a->fg)){
@@ -162,10 +165,10 @@ pA rechercheParentModifEquilibre(pA a, type e){ //dans le cas ou un element est 
         }
     }
 }
-void creationArbre(pA a, type elmt, int info){
+void creationArbre(pA a, elmt elmt, int info){
     pA tmp =rechercheParentCreation(a,elmt);
-    if (tmp->elmt = elmt){
-        tmp->doublon = tmp->doublon + 1;
+    if (tmp->elmt->station == elmt->station){
+
         return;
     }
     if (info == 1){ //info = 1 veut dire qu'on utilise un avl
@@ -174,7 +177,6 @@ void creationArbre(pA a, type elmt, int info){
     pA new= malloc(sizeof(Arbre));
     new -> elmt = elmt;
     new->equilibre = 0;
-    new->doublon = 0;
     new = creationFils(tmp,new,info);
 }
 
