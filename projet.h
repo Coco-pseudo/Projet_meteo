@@ -4,16 +4,16 @@
 
 typedef int type;
 typedef struct elmt{
-    int min;
-    int max;
-    int somme;
+    float min;
+    float max;
+    float somme;
     int nbelmt;
     int station; //peut contenir la date comme chaine de caractere
-}
+}Elmt;
 typedef struct arbre {
     struct arbre * fd;
     struct arbre * fg;
-    elmt elmt;
+    Elmt elmt;
     int equilibre;
 } Arbre ;
 typedef  Arbre* pA;

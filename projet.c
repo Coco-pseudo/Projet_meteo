@@ -1,5 +1,5 @@
 // station; temperature
-// station; tmpmin; tmpmax; tmpmoyenne;
+// station; tmpmoyenne; tmpmax; tmpmin;
 #include "projet.h"
 
 // to do list: creer fonction equilibrage d'avl, finir creation fils, finir creation arbre, finir le projet :)
@@ -10,15 +10,9 @@
 //mettre a jour le projet.h
 //continuer fonctions d'equilibrage et faire les fcts de pivot
 //rajouter la partie recherche des elements dans le fichier en parametre et creer un fichier qui contiendras les donnees tries
-/*typedef int type;
-typedef struct arbre {
-    struct arbre * fd;
-    struct arbre * fg;
-    type elmt;
-    int equilibre;
-    int doublon;
-} Arbre ;
-typedef Arbre * pA;
+//corriger le code actuel pour l'adapter a la nouvelle structure
+
+
 //a supprimer la liste suivante de prototypes
 int verifEquilibre (pA);
 */
@@ -39,11 +33,11 @@ int descendance(pA a){
     }
     return 0;
 }
-pA rechercheParentCreation(pA a, elmt e){ //dans le cas ou un element est egal a celui que l'on cree, on renvoie sa localisation, sinon c le futur parent.
+pA rechercheParentCreation(pA a, Elmt->station e){ //dans le cas ou un element est egal a celui que l'on cree, on renvoie sa localisation, sinon c le futur parent.
     if(!estVide(a)){
-        if(e< a->elmt){
+        if(e< a->elmt->station){
             if(!estVide(a->fg)){
-                if(e == a->fg->elmt){
+                if(e == a->fg->elmt->station){
                     return a->fg;
                 }else{
                     return rechercheParentCreation(a->fg, e);
@@ -52,9 +46,9 @@ pA rechercheParentCreation(pA a, elmt e){ //dans le cas ou un element est egal a
                 return a;
             }
         }else{
-            if(e> a->elmt){
+            if(e> a->elmt->station){
                 if(!estVide(a->fd)){
-                    if(e == a->fd->elmt){
+                    if(e == a->fd->elmt->station){
                         return a->fd;
                     }else{
                         return rechercheParentCreation(a->fd, e);
@@ -69,11 +63,11 @@ pA rechercheParentCreation(pA a, elmt e){ //dans le cas ou un element est egal a
     }
 }
 
-pA rechercheParent(pA a, elmt e){
+pA rechercheParent(pA a, Elmt->station e){
     if(!estVide(a)){
         if(e< a->elmt){
             if(!estVide(a->fg)){
-                if(e == a->fg->elmt){
+                if(e == a->fg->elmt->station){
                     return a;
                 }else{
                     return rechercheParent(a->fg, e);
@@ -84,7 +78,7 @@ pA rechercheParent(pA a, elmt e){
         }else{
             if(e> a->elmt){
                 if(!estVide(a->fd)){
-                    if(e == a->fd->elmt){
+                    if(e == a->fd->elmt->station){
                         return a;
                     }else{
                         return rechercheParent(a->fd, e);
@@ -99,8 +93,9 @@ pA rechercheParent(pA a, elmt e){
     }
 }
 
-pA creationFils (pA papa, pA enfant, int info){ //info sert a savoir si on le trie est AVL ou ABR
-    if(papa->elmt < enfant->elmt){
+//ne sert pas actuellement ...
+/*pA creationFils (pA papa, pA enfant, int info){ //info sert a savoir si on le trie est AVL ou ABR
+    if(papa->elmt->station < enfant->elmt->station){
         papa->fg = enfant;
         if(info == 1){
             papa ->equilibre = papa->equilibre - 1;
@@ -114,7 +109,7 @@ pA creationFils (pA papa, pA enfant, int info){ //info sert a savoir si on le tr
             verifEquilibre(papa);
         }
     }
-}
+}*/
 
 /*int verifEquilibre(pA a){ //retourne si |l'equilibre| d'un des noeuds est  >1
     if(!estVide(a)){
@@ -140,9 +135,9 @@ int verifEquilibre (pA a){ //si |equilibre de l'arbre >= 2, modifie
         }
     }else return 1;
 }
-pA rechercheParentModifEquilibre(pA a, elmt e){ //dans le cas ou un element est egal a celui que l'on cree, on renvoie sa localisation, sinon c le futur parent.
+pA rechercheParentModifEquilibre(pA a, Elmt->station e){ //dans le cas ou un element est egal a celui que l'on cree, on renvoie sa localisation, sinon c le futur parent.
     if(!estVide(a)){
-        if(e< a->elmt){
+        if(e< a->elmt->station){
             if(!estVide(a->fg)){
                 //modifier l'equilibre
                 a->equilibre = a->equilibre -1;
@@ -152,7 +147,7 @@ pA rechercheParentModifEquilibre(pA a, elmt e){ //dans le cas ou un element est 
                 return a;
             }
         }else{
-            if(e> a->elmt){
+            if(e> a->elmt->station){
                 if(!estVide(a->fd)){
                 //modifier l'equilibre
                 a->equilibre = a->equilibre +1;
@@ -165,7 +160,7 @@ pA rechercheParentModifEquilibre(pA a, elmt e){ //dans le cas ou un element est 
         }
     }
 }
-void creationArbre(pA a, elmt elmt, int info){
+void creationArbre(pA a, Elmt elmt, int info){
     pA tmp =rechercheParentCreation(a,elmt);
     if (tmp->elmt->station == elmt->station){
 
@@ -180,6 +175,15 @@ void creationArbre(pA a, elmt elmt, int info){
     new = creationFils(tmp,new,info);
 }
 
+void traitementAVL(FILE* fichier){
+    int a=0;
+    int tmp=1;
+    pA arbre = malloc(sizeof(Arbre));
+    while (tmp!=0){
+        tmp = test
+        creationArbre(arbre, tmp, 1);
+    }
+}
 
 
 //info = 1 veut dire qu'on utilise un avl
@@ -190,6 +194,7 @@ int main (int argc, char *argv[]) {// a indique le mode souhaité entre AVL, ABR
     printf("a=%c\n",a);
     switch (a){
         case ('1') :printf("1\n") ; //traitement en AVL
+        traitementAVL(argv[2])
         break;
         case ('2') :printf("2\n") ; //traitement en ABR 
         break;
