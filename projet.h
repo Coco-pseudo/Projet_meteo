@@ -1,9 +1,10 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
+#include <string.h>
 
-typedef int type;
-typedef struct elmt{
+typedef float type;
+typedef struct element{
     float min;
     float max;
     float somme;
@@ -13,21 +14,22 @@ typedef struct elmt{
 typedef struct arbre {
     struct arbre * fd;
     struct arbre * fg;
-    Elmt elmt;
+    struct element * elmt;
     int equilibre;
 } Arbre ;
 typedef  Arbre* pA;
 
 
 type absolu (type a);
-int max(type a, type b);
+type max(type a, type b);
 int estVide(pA a);
 int descendance(pA a);
-pA rechercheParentCreation(pA a, type e);
-pA rechercheParent(pA a, type e)
-pA creationFils (pA papa, pA enfant, int info);
+pA rechercheParentCreation(pA a, int id);
+pA rechercheParent(pA a, int id);
+//pA creationFils (pA papa, pA enfant, int info);
 int profondeurDescendance (pA a);
 void calculEquilibre (pA a);
 int verifEquilibre (pA a);
-pA rechercheParentModifEquilibre(pA a, type e);
-void creationArbre(pA a, type elmt, int info);
+pA rechercheParentModifEquilibre(pA a, int id);
+void creationArbre(pA a, Elmt* elm, int info);
+void traitementAVL(char nomdufichier);
