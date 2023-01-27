@@ -1,5 +1,5 @@
 // station; temperature
-// station; tmpmoyenne; tmpmax; tmpmin;
+// station; tmpmoyenne; tmpmin; tmpmax;
 #include "projet.h"
 
 // to do list: creer fonction equilibrage d'avl, finir creation fils, finir creation arbre, finir le projet :)
@@ -11,8 +11,7 @@
 //finir traitement avl
 //finir la correction de compilation
 
-//a supprimer la liste suivante de prototypes
-int verifEquilibre (pA);
+//fonctions manquantes pour les arbres: suppression d'un arbre
 
 //tout remanier pour avoir un tri par moyenne/ min/ max -> bcp moins d'elements
 type absolu (type a){
@@ -36,32 +35,35 @@ int descendance(pA a){
 }
 pA rechercheParentCreation(pA a, int id){ //dans le cas ou un element est egal a celui que l'on cree, on renvoie sa localisation, sinon c le futur parent.
     if(!estVide(a)){
-        if(id < a->elmt->station){
-            if(!estVide(a->fg)){
-                if(id == a->fg->elmt->station){
-                    return a->fg;
-                }else{
-                    return rechercheParentCreation(a->fg, id);
-                }
-            }else{
-                return a;
-            }
-        }else{
-            if(id > a->elmt->station){
-                if(!estVide(a->fd)){
-                    if(id == a->fd->elmt->station){
-                        return a->fd;
+        if(a->elmt != NULL){ //cas du premier element ajouté a l'arbre
+            if(id < a->elmt->station){
+                if(!estVide(a->fg)){
+                    if(id == a->fg->elmt->station){
+                        return a->fg;
                     }else{
-                        return rechercheParentCreation(a->fd, id);
+                        return rechercheParentCreation(a->fg, id);
                     }
                 }else{
                     return a;
                 }
-            }else{//a-> elmt->station == id (a est la racine de l'arbre d'origine)
-                return a;
+            }else{
+                if(id > a->elmt->station){
+                    if(!estVide(a->fd)){
+                        if(id == a->fd->elmt->station){
+                            return a->fd;
+                        }else{
+                            return rechercheParentCreation(a->fd, id);
+                        }
+                    }else{
+                        return a;
+                    }
+                }else{//a-> elmt->station == id (a est la racine de l'arbre d'origine)
+                    return a;
+                }
             }
         }
     }
+    return a;
 }
 
 pA rechercheParent(pA a, int id){
@@ -125,95 +127,194 @@ int profondeurDescendance (pA a){
         return 1;
     }return 0;
 }
-void calculEquilibre (pA a){
+void calculEquilibre (pA a){ //sert a recalculer l'equilibre sans se servir de la valeur precedente
     if(!estVide(a)) a->equilibre = profondeurDescendance(a->fg) - profondeurDescendance(a->fd);
 }
-int verifEquilibre (pA a){ //si |equilibre de l'arbre >= 2, modifie 
-    if(!estVide(a)){
-        if(absolu(a->equilibre >=2)){
-            //faire appel aux fonctions d'equilibrage, (surtouten fonctions des enfants)
-
-        }
-    }else return 1;
+Pile * creationPile(pA a){
+    Pile * nouveau = malloc(sizeof(Pile));
+    nouveau->arbre = a;
+    nouveau->modif = 0;
+    nouveau -> suivant = NULL;
+    return nouveau;
 }
-pA rechercheParentModifEquilibre(pA a, int id){ //dans le cas ou un element est egal a celui que l'on cree, on renvoie sa localisation, sinon c le futur parent.
-    if(!estVide(a)){
-        if(id < a->elmt->station){
-            if(!estVide(a->fg)){
-                //modifier l'equilibre
-                a->equilibre = a->equilibre -1;
-                verifEquilibre(a);
-                return rechercheParentModifEquilibre(a->fg, id);
+pA appelRechercheParentModifEquilibre(pA a, int id){
+    Pile * liste;
+    liste->arbre = a;
+    liste = rechercheParentModifEquilibre(id, liste);
+    pA b = NULL;
+    while(liste !=NULL && b != NULL){
+        liste->arbre->equilibre = liste->arbre->equilibre + liste->modif;
+        b = verifEquilibre(liste->arbre);
+        if(liste->arbre == a && b!= a) return b; //cas ou la racine est modifié
+        Pile * tmp = liste;
+        if(liste->suivant != NULL){
+            liste = liste->suivant;
+        }
+        free(tmp);
+    }
+    return a;
+}
+Pile * rechercheParentModifEquilibre(int id, Pile* pile){ //dans le cas ou un element est egal a celui que l'on cree, on renvoie sa localisation, sinon c le futur parent.
+    if(!estVide(pile->arbre)){
+        if(id < pile->arbre->elmt->station){
+            if(!estVide(pile->arbre->fg)){
+                Pile * nouveau = creationPile(pile->arbre->fg);
+                nouveau->modif = -1;
+                nouveau->suivant = pile;
+                return rechercheParentModifEquilibre(id, nouveau);
             }else{
-                return a;
+                return pile;
             }
         }else{
-            if(id > a->elmt->station){
-                if(!estVide(a->fd)){
-                //modifier l'equilibre
-                a->equilibre = a->equilibre +1;
-                verifEquilibre(a);
-                    return rechercheParentModifEquilibre(a->fd, id);
-                }else{
-                    return a;
+            if(id > pile->arbre->elmt->station){
+                if(!estVide(pile->arbre->fd)){
+                    Pile * nouveau = creationPile(pile->arbre->fd);
+                    nouveau->modif = 1;
+                    nouveau->suivant = pile;
+                    return rechercheParentModifEquilibre(id, nouveau);
+                }else{ //on a atteint le nouvel element
+                    return pile;
                 }
             }
         }
     }
+    return pile;
 }
-void creationArbre(pA a, Elmt* elm, int info){
+pA creationArbre(pA a, Elmt* elm, int info){ //si la station existe dans l'arbre
     pA tmp =rechercheParentCreation(a, elm->station);
-    if (tmp->elmt->station == elm->station || tmp->fg->elmt->station == elm->station || tmp->fd->elmt->station == elm->station){ //la station est deja presente dans le tableau
-        if (tmp->elmt->station == elm->station){
-            tmp->elmt->somme = tmp->elmt->somme + elm->somme; //elm->somme est la valeur de la nouvelle donnée (somme de 1 elmt)
-            tmp->elmt->nbelmt = tmp->elmt->nbelmt + elm->nbelmt; //elm->nbelmt est 1
-            tmp->elmt->min = min(tmp->elmt->min, elm->min);
-            tmp->elmt->max = max(tmp->elmt->max, elm->max);
-        }else{
-            if (tmp->fg->elmt->station == elm->station){
-                tmp->fg->elmt->somme = tmp->fg->elmt->somme + elm->somme; 
-                tmp->fg->elmt->nbelmt = tmp->fg->elmt->nbelmt + elm->nbelmt; 
-                tmp->fg->elmt->min = min(tmp->fg->elmt->min, elm->min);
-                tmp->fg->elmt->max = max(tmp->fg->elmt->max, elm->max);
-            }else{
-                tmp->fd->elmt->somme = tmp->fd->elmt->somme + elm->somme; 
-                tmp->fd->elmt->nbelmt = tmp->fd->elmt->nbelmt + elm->nbelmt; 
-                tmp->fd->elmt->min = min(tmp->fd->elmt->min, elm->min);
-                tmp->fd->elmt->max = max(tmp->fd->elmt->max, elm->max);
-            }
-        }
-        return;
-    }
-    if (info == 1){ //info = 1 veut dire qu'on utilise un avl
-        rechercheParentModifEquilibre(a,elm->station); 
-    }
     pA new= malloc(sizeof(Arbre));
+    if(tmp->elmt !=NULL){
+        if (tmp->elmt->station == elm->station || tmp->fg->elmt->station == elm->station || tmp->fd->elmt->station == elm->station){ //la station est deja presente dans le tableau
+            if (tmp->elmt->station == elm->station){
+                tmp->elmt->somme = tmp->elmt->somme + elm->somme; //elm->somme est la valeur de la nouvelle donnée (somme de 1 elmt)
+                tmp->elmt->nbelmt = tmp->elmt->nbelmt + elm->nbelmt; //elm->nbelmt est 1
+                tmp->elmt->min = min(tmp->elmt->min, elm->min);
+                tmp->elmt->max = max(tmp->elmt->max, elm->max);
+            }else{
+                if (tmp->fg->elmt->station == elm->station){
+                    tmp->fg->elmt->somme = tmp->fg->elmt->somme + elm->somme; 
+                    tmp->fg->elmt->nbelmt = tmp->fg->elmt->nbelmt + elm->nbelmt; 
+                    tmp->fg->elmt->min = min(tmp->fg->elmt->min, elm->min);
+                    tmp->fg->elmt->max = max(tmp->fg->elmt->max, elm->max);
+                }else{
+                    tmp->fd->elmt->somme = tmp->fd->elmt->somme + elm->somme; 
+                    tmp->fd->elmt->nbelmt = tmp->fd->elmt->nbelmt + elm->nbelmt; 
+                    tmp->fd->elmt->min = min(tmp->fd->elmt->min, elm->min);
+                    tmp->fd->elmt->max = max(tmp->fd->elmt->max, elm->max);
+                }
+            }
+            return a;
+        }
+        if (info == 1){ //info = 1 veut dire qu'on utilise un avl
+            a = appelRechercheParentModifEquilibre(a,elm->station); //modifier la fonction pour faire un parcour qui modifie des enfants vers les parents(genre une file)
+        }
+        if (tmp->elmt->station < new->elmt->station){
+            if(tmp->fg != NULL) exit(6); //code erreur a determiner
+            tmp->fg = new;
+        }else{
+            if(tmp->fd != NULL) exit(6); //code erreur a determiner
+            tmp->fd = new;
+        }
+    }else new = a;
     new -> elmt = elm;
     new->equilibre = 0;
     new->fg = NULL ;
     new->fd = NULL ;
-    if (tmp->elmt->station < new->elmt->station){
-        if(tmp->fg != NULL) exit(6); //code erreur a determiner
-        tmp->fg = new;
-    }else{
-        if(tmp->fd != NULL) exit(6); //code erreur a determiner
-        tmp->fd = new;
-    }
+    return a;
 }
 
-//ajouter securite: tester si le nom du fichier en entrée est celui que le c crée, si oui créer un fichier avec un autre nom par default
-void traitementAVL(char nomdufichier){
-    //transformer char nomdufichier en const char * restrict
-    FILE* fichier = fopen(nomdufichier, "r");
+//fonctions de rotation
+pA rotationSG(pA arbre){
+    pA pivot = arbre->fd;
+    arbre->fd = pivot->fg;
+    pivot->fg = arbre;
+    arbre->equilibre = arbre->equilibre - max(pivot->equilibre,0) -1;
+    pivot->equilibre = min(arbre->equilibre-2, min(arbre->equilibre + arbre->equilibre-2, pivot->equilibre - 1));
+    return pivot;
+}
+pA rotationSD(pA arbre){
+    pA pivot = arbre->fg;
+    arbre->fg = pivot->fd;
+    pivot->fd = arbre;
+    arbre->equilibre = arbre->equilibre - max(pivot->equilibre,0) +1;
+    pivot->equilibre = max(arbre->equilibre+2, max(arbre->equilibre + arbre->equilibre+2, pivot->equilibre + 1));
+    return pivot;   
+}
+pA rotationDG(pA arbre){ //AKA rota double gauche
+    arbre->fd=rotationSD(arbre->fd);
+    return rotationSG(arbre);
+}
+pA rotationGD(pA arbre){ //AKA rota double droite
+    arbre->fg=rotationSG(arbre->fg);
+    return rotationSD(arbre);
+}
+pA verifEquilibre (pA a){ //renvoie le pivot: si l'arbre envoyé etait la racine, modif de la racine
+    if(!estVide(a)){
+        if(absolu(a->equilibre)==2){
+            if(a->equilibre == 2){ //trop lourd sur la droite -> rotation SG ou DG
+                if(a->fd->equilibre == -1) a = rotationDG(a);
+                else a = rotationSG(a);
+            }
+            else{//trop lourd sur la gauche
+                if(a->fg->equilibre == 1) a = rotationGD(a);
+                else a = rotationSD(a);
+            }
+            return a;
+        }
+    }
+    return a;
+}
+
+//fonctions de modification de fichier
+FILE * ouvertureFichierSortie(char* nomdufichierentree){
+    //verifier la comparaison entre le nom du fichier en entree pour ne pas le supprimer en ouvrant celui en sortie
+    FILE* fichier = NULL;
+    char * chaine = "sortietest.csv";
+    if (chaine != nomdufichierentree){
+        fichier = fopen ( chaine, "w+");
+	    if (fichier == NULL)exit(6); //code erreur a determiner
+    }else {
+        fichier = fopen ("sortiedufourbe.csv", "w+");
+        if (fichier == NULL) exit(6);
+    }
+    return fichier;
+}
+void parcoursSufixeEcriture(FILE* fichier, pA arbre){ //ecriture de l'arbre dans l'ordre croissant
+    if(!estVide(arbre)){
+        if(!estVide(arbre->fd)) parcoursSufixeEcriture(fichier,arbre->fd);
+        ecriture(fichier, arbre);
+        if(!estVide(arbre->fg)) parcoursSufixeEcriture(fichier,arbre->fg);
+    }
+}
+void parcoursInfixeEcriture(FILE* fichier,pA arbre){ //ecriture de l'arbre dans le tri croissant
+    if(!estVide(arbre)){
+        if(!estVide(arbre->fg)) parcoursInfixeEcriture(fichier,arbre->fg);
+        ecriture(fichier, arbre);
+        if(!estVide(arbre->fd)) parcoursInfixeEcriture(fichier,arbre->fd);
+    }
+}
+void ecriture (FILE * fichier, pA arbre){// arbre en entrée, ecrit dans le fichier les elements de pa dans l'ordre
+    fprintf(fichier, "%d;%f;%f;%f;\n", arbre->elmt->station, arbre->elmt->somme / arbre->elmt->nbelmt, arbre->elmt->min, arbre->elmt->max);
+}
+
+//se renseigner sur feof
+void traitementAVL(char *  nomdufichier){
+    FILE* fichierEntree = fopen(nomdufichier, "r");
+    FILE* fichierSortie = ouvertureFichierSortie(nomdufichier);
     //info sera 1 pour tout
-    int a=0;
     int tmp2;
     pA arbre = malloc(sizeof(Arbre));
     Elmt * tmp = malloc(sizeof(Elmt));
-    while (tmp!=0){
-//        tmp = test();
-        creationArbre(arbre, tmp, 1);
+    while (! feof(fichierEntree)){ //boucle de creation de l'arbre
+        fscanf(fichierEntree, "%d", &tmp->station);
+        fscanf(fichierEntree, "%f", &tmp->somme);
+        tmp->nbelmt = 1;
+        tmp->min = tmp->somme;
+        tmp->max = tmp->somme;
+        arbre = creationArbre(arbre, tmp, 1);
     }
+    fclose(fichierEntree);
+    parcoursInfixeEcriture(fichierSortie, arbre);
 }
 
 
@@ -223,11 +324,13 @@ int main (int argc, char *argv[]) {// a indique le mode souhaité entre AVL, ABR
     char test = argv [1][1];
     if (test != '\0') exit (6); //code erreur a determiner
     printf("a=%c\n",a);
+    int i= strlen(argv[2]);
+    if (i == 0) exit(6); //code a determiner
     switch (a){
         case ('1') :printf("1\n") ; //traitement en AVL
-        printf("%c",argv[2]);
+        printf("%s",argv[2]);
         if (argv[2]==NULL) exit(6);//code a determiner
-        traitementAVL(*argv[2]);
+        traitementAVL(argv[2]);
         break;
         case ('2') :printf("2\n") ; //traitement en ABR 
         break;
