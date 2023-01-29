@@ -52,7 +52,7 @@ pA appelRechercheParentModifEquilibre(pA a, int id);
 Pile * rechercheParentModifEquilibre(int id, Pile* pile);
 
 
-void traitementAVL(char* nomdufichier);
+void traitementArbre(char* nomdufichier, int info);
 FILE * ouvertureFichierSortie(char* nomdufichierentree);
 void ecriture (FILE * fichier, pA arbre);
 void parcoursSufixeEcriture(FILE* fichier, pA arbre);

@@ -105,7 +105,7 @@ pA rechercheParent(pA a, int id){
             verifEquilibre(papa);
         }
     }else{
-        if(papa->elmt == enfant->elmt)exit(2); 
+        if(papa->elmt == enfant->elmt)exit(2);
         papa->fd = enfant;
         if(info == 1){
             papa ->equilibre = papa->equilibre + 1;
@@ -192,13 +192,13 @@ pA creationArbre(pA a, Elmt* elm, int info){ //si la station existe dans l'arbre
                 tmp->elmt->max = max(tmp->elmt->max, elm->max);
             }else{
                 if (tmp->fg->elmt->station == elm->station){
-                    tmp->fg->elmt->somme = tmp->fg->elmt->somme + elm->somme; 
-                    tmp->fg->elmt->nbelmt = tmp->fg->elmt->nbelmt + elm->nbelmt; 
+                    tmp->fg->elmt->somme = tmp->fg->elmt->somme + elm->somme;
+                    tmp->fg->elmt->nbelmt = tmp->fg->elmt->nbelmt + elm->nbelmt;
                     tmp->fg->elmt->min = min(tmp->fg->elmt->min, elm->min);
                     tmp->fg->elmt->max = max(tmp->fg->elmt->max, elm->max);
                 }else{
-                    tmp->fd->elmt->somme = tmp->fd->elmt->somme + elm->somme; 
-                    tmp->fd->elmt->nbelmt = tmp->fd->elmt->nbelmt + elm->nbelmt; 
+                    tmp->fd->elmt->somme = tmp->fd->elmt->somme + elm->somme;
+                    tmp->fd->elmt->nbelmt = tmp->fd->elmt->nbelmt + elm->nbelmt;
                     tmp->fd->elmt->min = min(tmp->fd->elmt->min, elm->min);
                     tmp->fd->elmt->max = max(tmp->fd->elmt->max, elm->max);
                 }
@@ -238,7 +238,7 @@ pA rotationSD(pA arbre){
     pivot->fd = arbre;
     arbre->equilibre = arbre->equilibre - max(pivot->equilibre,0) +1;
     pivot->equilibre = max(arbre->equilibre+2, max(arbre->equilibre + arbre->equilibre+2, pivot->equilibre + 1));
-    return pivot;   
+    return pivot;
 }
 pA rotationDG(pA arbre){ //AKA rota double gauche
     arbre->fd=rotationSD(arbre->fd);
@@ -298,23 +298,44 @@ void ecriture (FILE * fichier, pA arbre){// arbre en entrée, ecrit dans le fich
 }
 
 //se renseigner sur feof
-void traitementAVL(char *  nomdufichier){
+void traitementArbre(char *  nomdufichier, int info){
     FILE* fichierEntree = fopen(nomdufichier, "r");
     FILE* fichierSortie = ouvertureFichierSortie(nomdufichier);
+    printf("ok pour l'ouverture des fichiers");
     //info sera 1 pour tout
     int tmp2;
     pA arbre = malloc(sizeof(Arbre));
+    int a;
     Elmt * tmp = malloc(sizeof(Elmt));
-    while (! feof(fichierEntree)){ //boucle de creation de l'arbre
-        fscanf(fichierEntree, "%d", &tmp->station);
+    //initialisation
+    if(! feof(fichierEntree)){
+      fscanf(fichierEntree, "%d", &tmp->station);
+      a = fgetc(fichierEntree);
+      if (a!='\n'&&a!='EOF'){
+        fseek(fichierEntree,SEEK_CUR,-1);
         fscanf(fichierEntree, "%f", &tmp->somme);
         tmp->nbelmt = 1;
         tmp->min = tmp->somme;
         tmp->max = tmp->somme;
-        arbre = creationArbre(arbre, tmp, 1);
+        arbre = creationArbre(arbre, tmp, info);
+      }
+      //boucle generale
+    while (! feof(fichierEntree)){ //boucle de creation de l'arbre
+        fscanf(fichierEntree, "%d", &tmp->station);
+        a = fgetc(fichierEntree);
+        if (a!='\n'&&a!='EOF'){
+          fseek(fichierEntree,SEEK_CUR,-1);
+          fscanf(fichierEntree, "%f", &tmp->somme);
+          tmp->nbelmt = 1;
+          tmp->min = tmp->somme;
+          tmp->max = tmp->somme;
+          arbre = creationArbre(arbre, tmp, info);
+        }
     }
+    printf("ok pour la creation de l'arbre");
     fclose(fichierEntree);
     parcoursInfixeEcriture(fichierSortie, arbre);
+    printf("ok pour l'ecriture");
 }
 
 
@@ -329,18 +350,19 @@ int main (int argc, char *argv[]) {// a indique le mode souhaité entre AVL, ABR
     switch (a){
         case ('1') :printf("1\n") ; //traitement en AVL
         printf("%s",argv[2]);
+        printf("ok jusqu'a la fin des tests des variables");
         if (argv[2]==NULL) exit(6);//code a determiner
-        traitementAVL(argv[2]);
+        traitementArbre(argv[2],1);
         break;
-        case ('2') :printf("2\n") ; //traitement en ABR 
+        case ('2') :printf("2\n") ; //traitement en ABR
         break;
         case ('3') :printf("3\n")  ;//traitement en tableau
         break;
-        default : 
+        default :
             printf("erreur dans l'option\n"); //ne devrait pas arriver car testé dans le script
             exit(1);
             break;
     }
     return 0;
-    
+
 }
