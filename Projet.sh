@@ -87,10 +87,10 @@ do
             avl) echo "Option avl"
             T=1
             ;;
-            help) echo "Menu help" 
-            exit 2
+            help)  cat help.txt | more
+            exit 0
             ;;
-            *) echo "$OPTARG: option inconnue"
+            *) echo "--$OPTARG: option inconnue"
             exit 1
         esac
 
@@ -109,11 +109,11 @@ do
         help) echo "Option help"
 
         ;;
-        :) echo "L'option $OPTARG nécessite un argument (mode/nom de fichier)"
+        :) echo "L'option -$OPTARG nécessite un argument (mode/nom de fichier)"
         exit 1
         ;;
         
-        \?) echo "$OPTARG: option inconnue"
+        \?) echo "-$OPTARG : option inconnue"
         exit 1
 
         ;;
@@ -131,7 +131,7 @@ done
 
 if [ -z "$f" ]
 then
-    echo "Sélectionner l'option fichier (obligatoire)"
+    echo "Sélectionner l'option fichier -f (obligatoire)"
     exit 2
 fi
 
@@ -143,7 +143,7 @@ fi
 #verif presence fichier dans dossier 
 #OK
 
-#traiter les options composées de chaines de caractères --> considérer - comme une option et regarder les arguments ensuite via un autre case{...}
+#traiter les options composées de chaines de caractères --> considérer "-" comme une option et regarder les arguments ensuite via un autre case{...}
 #OK
 
 #verif un seul choix parmis AVL,ABR,tab     --> si pas de choix, AVL par défaut
@@ -172,8 +172,7 @@ then
 fi
 #verif deux argument pour option date, avec min, max
 
-#verif au moins un parmis t,p,w,h 
-#ok
+#verif au moins un parmis t,p,w,h ==> ok
 
 if   [ -z "$t" ] && [ -z "$p" ]  && [ -z "$w" ] && [ -z "$m" ] && [ -z "$h" ]
 then
@@ -195,15 +194,15 @@ fi
 #commande HELP
 
 
-
+#-------------partie "epuration" du fichier--------------
 case $t in 
-    1)cut -d";" -f1,11 $I > tmp.csv
+    1)cut -d";" -f1,11 $I > Tmp.csv
     M=1
     ;;
-    2)cut -d";" -f2,11 $I > tmp.csv
+    2)cut -d";" -f2,11 $I > Tmp.csv
     M=2
     ;;
-    3)cut -d";" -f1,2,11 $I > tmp.csv
+    3)cut -d";" -f1,2,11 $I > Tmp.csv
     M=3
     ;;
     \?)
@@ -211,13 +210,13 @@ case $t in
 esac
 
 case $p in 
-    1)cut -d";" -f1,7 $I > tmp.csv
+    1)cut -d";" -f1,7 $I > Tmp.csv
     M=1
     ;;
-    2)cut -d";" -f2,7 $I > tmp.csv
+    2)cut -d";" -f2,7 $I > Tmp.csv
     M=2
     ;;
-    3)cut -d";" -f1,2,7 $I > tmp.csv
+    3)cut -d";" -f1,2,7 $I > Tmp.csv
     M=3
     ;;
     \?)
@@ -225,29 +224,116 @@ case $p in
 esac
 
 
-if [ ! -z "$w" ]
+if [ ! -z "$w" ] 
 then
     if [ $w -eq 1 ] 
     then
-        cut -d";" -f1,4,5  $I > tmp.csv
+        M=4
+        cut -d";" -f1,4,5  $I > Tmp.csv
     fi
 fi
 
-if [ ! -z "$m" ]
+if [ ! -z "$m" ] # mettre longitude, lattitude et pas Id station
 then
     if [ $m -eq 1 ] 
     then
-        cut -d";" -f1,6  $I > tmp.csv
+        cut -d";" -f10,6  $I > Tmp2.csv
+        sed 's/,/;/g' "Tmp2.csv" >Tmp.csv
+        rm Tmp2.csv 
+        M=5
     fi
 fi
 
-if [ ! -z "$h" ]
+if [ ! -z "$h" ] # mettre longitude, lattitude et pas Id station
 then
     if [ $h -eq 1 ] 
     then
-        cut -d";" -f1,14 $I > tmp.csv
+        cut -d";" -f14,10 $I > Tmp2.csv
+        sed 's/,/;/g' "Tmp2.csv" >Tmp3.csv
+        awk -F\; '{print $3";"$1";"$2}' Tmp3.csv >Tmp.csv
+        rm Tmp2.csv
+        rm Tmp3.csv
     fi
 fi
+ 
+
+
+#retirer la premiere ligne (avec les chaines de caractères)
+sed '1d' Tmp.csv > tmp.csv
+rm Tmp.csv
+
+
+
+
+#-------------------utilisation du c-----------------
+gcc Projet.c -o Exec 
+./Exec 1 tmp.csv
+
+sed 's/\./,/g' "ValeursRetours.csv" > ValeursRetours2.csv
+rm ValeursRetours.csv
+mv ValeursRetours2.csv ValeursRetours.csv
+
+
+
+
+
+
+
+#------------------partie affichage gnuplot-----------------------
+
+
+
+case $M in 
+
+    1)
+    cp ValeursRetours.csv testgnuplot/
+    cd testgnuplot
+    gnuplot Barre.gnu --persist
+    cd ..
+    ;;
+
+
+    2)
+    cd testgnuplot
+    gnuplot Ligne.gnu --persist
+    cd ..
+
+    ;;
+
+
+
+
+    3)
+    cd testgnuplot
+    gnuplot MultiLigne.gnu --persist
+    cd ..
+    ;;
+
+
+
+
+    4)
+    cd testgnuplot 
+    gnuplot vecteur.gnu --persist
+    cd ..
+    ;;
+
+
+
+    5)cd testgnuplot 
+    gnuplot CarteInter.gnu --persist
+    cd ..
+    ;;
+
+
+
+    \?)
+    exit 1
+
+
+esac
+
+
 echo "done"
 exit 0
 
