@@ -331,6 +331,7 @@ void traitementArbre(char *  nomdufichier, int info){
           tmp->max = tmp->somme;
           arbre = creationArbre(arbre, tmp, info);
         }
+      }
     }
     printf("ok pour la creation de l'arbre");
     fclose(fichierEntree);
