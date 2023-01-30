@@ -18,7 +18,7 @@ type absolu (type a){
     return (a>=0 ? a : -a);
 }
 type max(type a, type b){
-    return (a<b ? a : b);
+    return (a>b ? a : b);
 }
 type min(type a, type b){
     return (a<b ? a : b);
@@ -34,9 +34,12 @@ int descendance(pA a){
     return 0;
 }
 pA rechercheParentCreation(pA a, int id){ //dans le cas ou un element est egal a celui que l'on cree, on renvoie sa localisation, sinon c le futur parent.
+    //printf("%d, %d", &a, id);
+    //printf(" %d \n", a->elmt->station);
     if(!estVide(a)){
-        if(a->elmt != NULL){ //cas du premier element ajouté a l'arbre
+        if(a->elmt != NULL){ //cas du premier element ajouté a l'arbre (ne devrait pas etre rencontré)
             if(id < a->elmt->station){
+            //if(a->elmt->station > id){
                 if(!estVide(a->fg)){
                     if(id == a->fg->elmt->station){
                         return a->fg;
@@ -48,7 +51,8 @@ pA rechercheParentCreation(pA a, int id){ //dans le cas ou un element est egal a
                 }
             }else{
                 if(id > a->elmt->station){
-                    if(!estVide(a->fd)){
+                //if(a->elmt->station < id){
+                    if(! estVide(a->fd)){
                         if(id == a->fd->elmt->station){
                             return a->fd;
                         }else{
@@ -66,7 +70,8 @@ pA rechercheParentCreation(pA a, int id){ //dans le cas ou un element est egal a
     return a;
 }
 
-pA rechercheParent(pA a, int id){
+/*pA rechercheParent(pA a, int id){
+    printf("%d, %d", &a, id);
     if(!estVide(a)){
         if(id < a->elmt->station){
             if(!estVide(a->fg)){
@@ -94,7 +99,7 @@ pA rechercheParent(pA a, int id){
             }
         }
     }
-}
+}*/
 
 //ne sert pas actuellement ...
 /*pA creationFils (pA papa, pA enfant, int info){ //info sert a savoir si on le trie est AVL ou ABR
@@ -138,8 +143,8 @@ Pile * creationPile(pA a){
     return nouveau;
 }
 pA appelRechercheParentModifEquilibre(pA a, int id){
-    Pile * liste;
-    liste->arbre = a;
+    Pile * liste = malloc(sizeof(Pile));
+    liste = creationPile(a);
     liste = rechercheParentModifEquilibre(id, liste);
     pA b = NULL;
     while(liste !=NULL && b != NULL){
@@ -182,45 +187,41 @@ Pile * rechercheParentModifEquilibre(int id, Pile* pile){ //dans le cas ou un el
 }
 pA creationArbre(pA a, Elmt* elm, int info){ //si la station existe dans l'arbre
     pA tmp =rechercheParentCreation(a, elm->station);
+    printf("%d ", tmp->elmt->station);
+    printf("%d \n", elm->station);
+    //printf("%d \n", &a);
     pA new= malloc(sizeof(Arbre));
     if(tmp->elmt !=NULL){
-        if (tmp->elmt->station == elm->station || tmp->fg->elmt->station == elm->station || tmp->fd->elmt->station == elm->station){ //la station est deja presente dans le tableau
-            if (tmp->elmt->station == elm->station){
-                tmp->elmt->somme = tmp->elmt->somme + elm->somme; //elm->somme est la valeur de la nouvelle donnée (somme de 1 elmt)
-                tmp->elmt->nbelmt = tmp->elmt->nbelmt + elm->nbelmt; //elm->nbelmt est 1
-                tmp->elmt->min = min(tmp->elmt->min, elm->min);
-                tmp->elmt->max = max(tmp->elmt->max, elm->max);
-            }else{
-                if (tmp->fg->elmt->station == elm->station){
-                    tmp->fg->elmt->somme = tmp->fg->elmt->somme + elm->somme;
-                    tmp->fg->elmt->nbelmt = tmp->fg->elmt->nbelmt + elm->nbelmt;
-                    tmp->fg->elmt->min = min(tmp->fg->elmt->min, elm->min);
-                    tmp->fg->elmt->max = max(tmp->fg->elmt->max, elm->max);
-                }else{
-                    tmp->fd->elmt->somme = tmp->fd->elmt->somme + elm->somme;
-                    tmp->fd->elmt->nbelmt = tmp->fd->elmt->nbelmt + elm->nbelmt;
-                    tmp->fd->elmt->min = min(tmp->fd->elmt->min, elm->min);
-                    tmp->fd->elmt->max = max(tmp->fd->elmt->max, elm->max);
-                }
-            }
+        if (tmp->elmt->station == elm->station){ //la station est deja presente dans le tableau
+        //|| tmp->fg->elmt->station == elm->station || tmp->fd->elmt->station == elm->station
+        //probleme ici: on ne fait que rentrer dans cette boucle.
+        //revoir fonctionnement de recherche parent creation et les conditions d'entree
+            //printf("test arbre station tmp");
+            tmp->elmt->somme = tmp->elmt->somme + elm->somme; //elm->somme est la valeur de la nouvelle donnée (somme de 1 elmt)
+            tmp->elmt->nbelmt = tmp->elmt->nbelmt + elm->nbelmt; //elm->nbelmt est 1
+            tmp->elmt->min = min(tmp->elmt->min, elm->min);
+            tmp->elmt->max = max(tmp->elmt->max, elm->max);
             return a;
-        }
+        }else{
         if (info == 1){ //info = 1 veut dire qu'on utilise un avl
             a = appelRechercheParentModifEquilibre(a,elm->station); //modifier la fonction pour faire un parcour qui modifie des enfants vers les parents(genre une file)
         }
-        if (tmp->elmt->station < new->elmt->station){
-            if(tmp->fg != NULL) exit(6); //code erreur a determiner
-            tmp->fg = new;
-        }else{
+        if (tmp->elmt->station < elm->station){
             if(tmp->fd != NULL) exit(6); //code erreur a determiner
             tmp->fd = new;
+            printf("fils va a droite\n");
+        }else{
+            if(tmp->fg != NULL) exit(6); //code erreur a determiner
+            tmp->fg = new;
+            printf("fils va a gauche\n");
         }
-    }else new = a;
-    new -> elmt = elm;
-    new->equilibre = 0;
-    new->fg = NULL ;
-    new->fd = NULL ;
-    return a;
+        new -> elmt = elm;
+        new->equilibre = 0;
+        new->fg = NULL ;
+        new->fd = NULL ;
+        return a;
+        }
+    }
 }
 
 //fonctions de rotation
@@ -252,14 +253,18 @@ pA verifEquilibre (pA a){ //renvoie le pivot: si l'arbre envoyé etait la racine
     if(!estVide(a)){
         if(absolu(a->equilibre)==2){
             if(a->equilibre == 2){ //trop lourd sur la droite -> rotation SG ou DG
-                if(a->fd->equilibre == -1) a = rotationDG(a);
-                else a = rotationSG(a);
+                printf("tout va bien\n");
+                if(!estVide(a->fd)){
+                    if(a->fd->equilibre == -1) a = rotationDG(a);
+                    else a = rotationSG(a);
+                }
             }
             else{//trop lourd sur la gauche
-                if(a->fg->equilibre == 1) a = rotationGD(a);
-                else a = rotationSD(a);
+                if(!estVide(a->fd)){
+                    if(a->fg->equilibre == 1) a = rotationGD(a);
+                    else a = rotationSD(a);
+                }
             }
-            return a;
         }
     }
     return a;
@@ -294,6 +299,7 @@ void parcoursInfixeEcriture(FILE* fichier,pA arbre){ //ecriture de l'arbre dans 
     }
 }
 void ecriture (FILE * fichier, pA arbre){// arbre en entrée, ecrit dans le fichier les elements de pa dans l'ordre
+    //printf("%li \n", ftell(fichier));
     fprintf(fichier, "%d;%f;%f;%f;\n", arbre->elmt->station, arbre->elmt->somme / arbre->elmt->nbelmt, arbre->elmt->min, arbre->elmt->max);
 }
 
@@ -301,43 +307,56 @@ void ecriture (FILE * fichier, pA arbre){// arbre en entrée, ecrit dans le fich
 void traitementArbre(char *  nomdufichier, int info){
     FILE* fichierEntree = fopen(nomdufichier, "r");
     FILE* fichierSortie = ouvertureFichierSortie(nomdufichier);
-    printf("ok pour l'ouverture des fichiers");
+    //printf("ok pour l'ouverture des fichiers \n");
     //info sera 1 pour tout
     int tmp2;
     pA arbre = malloc(sizeof(Arbre));
+    Elmt * elmt1 = malloc(sizeof(Elmt));
+    if(elmt1 == NULL) exit(6); //code a definir
+    //else printf("ok pointeur\n");
     int a;
     Elmt * tmp = malloc(sizeof(Elmt));
     //initialisation
     if(! feof(fichierEntree)){
-      fscanf(fichierEntree, "%d", &tmp->station);
+      fscanf(fichierEntree, "%d", &elmt1->station);
       a = fgetc(fichierEntree);
-      if (a!='\n'&&a!='EOF'){
+      if (a != '\n' &&a != EOF){
         fseek(fichierEntree,SEEK_CUR,-1);
-        fscanf(fichierEntree, "%f", &tmp->somme);
-        tmp->nbelmt = 1;
-        tmp->min = tmp->somme;
-        tmp->max = tmp->somme;
-        arbre = creationArbre(arbre, tmp, info);
+        fscanf(fichierEntree, "%f", &elmt1->somme);
+        //printf("%d, %f \n", tmp->station, tmp->somme);
+        elmt1->nbelmt = 1;
+        elmt1->min = tmp->somme;
+        elmt1->max = tmp->somme;
+        arbre->elmt = elmt1;
       }
       //boucle generale
     while (! feof(fichierEntree)){ //boucle de creation de l'arbre
+        tmp = malloc(sizeof(Elmt));
         fscanf(fichierEntree, "%d", &tmp->station);
         a = fgetc(fichierEntree);
-        if (a!='\n'&&a!='EOF'){
+        if (a != '\n' &&a != EOF){
           fseek(fichierEntree,SEEK_CUR,-1);
           fscanf(fichierEntree, "%f", &tmp->somme);
+          //printf("%d, %f \n", tmp->station, tmp->somme);
           tmp->nbelmt = 1;
           tmp->min = tmp->somme;
           tmp->max = tmp->somme;
+          //printf("avant creation arbre \n");
           arbre = creationArbre(arbre, tmp, info);
+            //printf("ok jusqu'ici \n");
         }
       }
     }
-    printf("ok pour la creation de l'arbre");
+    //printf("ok pour la creation de l'arbre \n");
     fclose(fichierEntree);
+    //printf("%d est la racine de l'arbre \n" , arbre->elmt->station);
+    //parcoursInfixe(arbre);
     parcoursInfixeEcriture(fichierSortie, arbre);
-    printf("ok pour l'ecriture");
+    //printf("ok pour l'ecriture \n");
 }
+/*probleme a corriger: seule la derniere ligne du fichier est affiche dans le fichier de sortie.
+Cause possible: defaults dans la creation/gestion de l'arbre
+pas ecriture (testé)*/
 
 
 //info = 1 veut dire qu'on utilise un avl
@@ -346,16 +365,17 @@ int main (int argc, char *argv[]) {// a indique le mode souhaité entre AVL, ABR
     char test = argv [1][1];
     if (test != '\0') exit (6); //code erreur a determiner
     printf("a=%c\n",a);
+    //if (argv[2]==NULL) exit(6);//code a determiner
     int i= strlen(argv[2]);
     if (i == 0) exit(6); //code a determiner
     switch (a){
         case ('1') :printf("1\n") ; //traitement en AVL
-        printf("%s",argv[2]);
-        printf("ok jusqu'a la fin des tests des variables");
-        if (argv[2]==NULL) exit(6);//code a determiner
+        //printf("%s \n",argv[2]);
+        //printf("ok jusqu'a la fin des tests des variables \n");
         traitementArbre(argv[2],1);
         break;
         case ('2') :printf("2\n") ; //traitement en ABR
+        traitementArbre(argv[2],0);
         break;
         case ('3') :printf("3\n")  ;//traitement en tableau
         break;
@@ -367,3 +387,197 @@ int main (int argc, char *argv[]) {// a indique le mode souhaité entre AVL, ABR
     return 0;
 
 }
+
+
+void parcoursInfixe(pA arbre){
+    if(!estVide(arbre)){
+        if(!estVide(arbre->fg)){
+            parcoursInfixe(arbre->fg);
+        }
+        printf("%d, %f, %f, %f \n",   arbre->elmt->station, arbre->elmt->somme / arbre->elmt->nbelmt, arbre->elmt->min, arbre->elmt->max);
+        if(!estVide(arbre->fd)) {
+            parcoursInfixe(arbre->fd);
+        }
+    }
+}
+
+/*
+int main (){
+    pA arbre = malloc(sizeof(Arbre));
+    Elmt * element1 = malloc (sizeof(Elmt));
+    Elmt * element2 = malloc (sizeof(Elmt));
+    Elmt * element3 = malloc (sizeof(Elmt));
+    Elmt * element4 = malloc (sizeof(Elmt));
+    Elmt * element5 = malloc (sizeof(Elmt));
+    Elmt * element6 = malloc (sizeof(Elmt));
+    Elmt * element7 = malloc (sizeof(Elmt));
+    Elmt * element8 = malloc (sizeof(Elmt));
+    Elmt * element9 = malloc (sizeof(Elmt));
+    Elmt * element10 = malloc (sizeof(Elmt));
+    Elmt * element11 = malloc (sizeof(Elmt));
+    Elmt * element12 = malloc (sizeof(Elmt));
+    Elmt * element13 = malloc (sizeof(Elmt));
+    Elmt * element14 = malloc (sizeof(Elmt));
+    Elmt * element15 = malloc (sizeof(Elmt));
+    Elmt * element16 = malloc (sizeof(Elmt));
+    Elmt * element17 = malloc (sizeof(Elmt));
+    Elmt * element18 = malloc (sizeof(Elmt));
+    Elmt * element19 = malloc (sizeof(Elmt));
+    Elmt * element20 = malloc (sizeof(Elmt));
+    Elmt * element21 = malloc (sizeof(Elmt));
+
+
+    element1->station = 15;
+    element2->station = 15;
+    element3->station = 10;
+    element4->station = 16;
+    element5->station = 9;
+    element6->station = 11;
+    element7 -> station = 7;
+    element8 -> station = 8; 
+    element9 -> station = 9; 
+    element10->station = 22;
+    element11->station = 25;
+    element12->station = 27;
+    element13->station = 23;
+    element14->station = 25;
+    element15->station = 24;
+    element16->station = 26;
+    element17->station = 28;
+    element18->station = 27;
+    element19->station = 25;
+    element20->station = 13;
+    element21->station = 20;
+
+    element1->somme = 30;
+    element1->min = 30;
+    element1->max = 30;
+    element1->nbelmt = 1;
+
+    element2->somme = 10;
+    element2->min = 10;
+    element2->max = 10;
+    element2->nbelmt = 1;
+
+    element3->somme = 30;
+    element3->min = 30;
+    element3->max = 30;
+    element3->nbelmt = 1;
+
+    element4->somme = 30;
+    element4->min = 30;
+    element4->max = 30;
+    element4->nbelmt = 1;
+
+    element5->somme = 30;
+    element5->min = 30;
+    element5->max = 30;
+    element5->nbelmt = 1;
+
+    element6->somme = 30;
+    element6->min = 30;
+    element6->max = 30;
+    element6->nbelmt = 1;
+
+    element7->somme =25;
+    element7->min = 25;
+    element7->max = 25;
+    element7->nbelmt = 1;
+
+    element8->somme =25;
+    element8->min = 25;
+    element8->max = 25;
+    element8->nbelmt = 1;
+
+    element9->somme =25;
+    element9->min = 25;
+    element9->max = 25;
+    element9->nbelmt = 1;
+
+    element10->somme =25;
+    element10->min = 25;
+    element10->max = 25;
+    element10->nbelmt = 1;
+
+    element11->somme =25;
+    element11->min = 25;
+    element11->max = 25;
+    element11->nbelmt = 1;
+
+    element12->somme =25;
+    element12->min = 25;
+    element12->max = 25;
+    element12->nbelmt = 1;
+    
+    element13->somme =25;
+    element13->min = 25;
+    element13->max = 25;
+    element13->nbelmt = 1;
+    
+    element14->somme =25;
+    element14->min = 25;
+    element14->max = 25;
+    element14->nbelmt = 1;
+
+    element15->somme = 25;
+    element15->min = 25;
+    element15->max = 25;
+    element15->nbelmt = 1;
+
+    element16->somme = 25;
+    element16->min = 25;
+    element16->max = 25;
+    element16->nbelmt = 1;
+
+    element17->somme = 25;
+    element17->min = 25;
+    element17->max = 25;
+    element17->nbelmt = 1;
+
+    element18->somme = 25;
+    element18->min = 25;
+    element18->max = 25;
+    element18->nbelmt = 1;
+
+    element19->somme = 25;
+    element19->min = 25;
+    element19->max = 25;
+    element19->nbelmt = 1;
+
+    element20->somme = 25;
+    element20->min = 25;
+    element20->max = 25;
+    element20->nbelmt = 1;
+
+    element21->somme = 25;
+    element21->min = 25;
+    element21->max = 25;
+    element21->nbelmt = 1;
+
+
+    arbre->elmt = element1;
+    arbre = creationArbre(arbre, element2, 1);
+    arbre = creationArbre(arbre, element3, 1);
+    arbre = creationArbre(arbre, element4, 1);
+    arbre = creationArbre(arbre, element5, 1);
+    arbre = creationArbre(arbre, element6, 1);
+    arbre = creationArbre(arbre, element7, 1);
+    arbre = creationArbre(arbre, element8, 1);
+    arbre = creationArbre(arbre, element9, 1);
+    arbre = creationArbre(arbre, element10, 1);
+    arbre = creationArbre(arbre, element11, 1);
+    arbre = creationArbre(arbre, element12, 1);
+    arbre = creationArbre(arbre, element13, 1);
+    arbre = creationArbre(arbre, element14, 1);
+    arbre = creationArbre(arbre, element15, 1);
+    arbre = creationArbre(arbre, element16, 1);
+    arbre = creationArbre(arbre, element17, 1);
+    arbre = creationArbre(arbre, element18, 1);
+    arbre = creationArbre(arbre, element19, 1);
+    arbre = creationArbre(arbre, element20, 1);
+    arbre = creationArbre(arbre, element21, 1);
+    parcoursInfixe(arbre);
+
+}
+
+*/

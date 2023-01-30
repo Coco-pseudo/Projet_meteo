@@ -57,3 +57,4 @@ FILE * ouvertureFichierSortie(char* nomdufichierentree);
 void ecriture (FILE * fichier, pA arbre);
 void parcoursSufixeEcriture(FILE* fichier, pA arbre);
 void parcoursInfixeEcriture(FILE* fichier,pA arbre);
+void parcoursInfixe(pA arbre);
