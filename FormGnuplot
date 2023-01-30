@@ -1,0 +1,11 @@
+mode 1 temp/ pression : Id ; var moy ;var min; var max 
+mode 2 temp/ pression : date/heure ; var moy
+mode 3 temp/ pression : date/heure ; Id ; var
+mode vent : Id ; position X ; position Y ; dl sur X ; dl sur Y
+mode altitude : longitude; latitude ; altitude
+mode humidité : longitude; latitude ; humidité max
+
+
+
+date heure  format : YYYY-mm-ddTHH:MM
+
