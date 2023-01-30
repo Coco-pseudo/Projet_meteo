@@ -34,7 +34,7 @@ int estVide(pA a);
 int descendance(pA a);
 pA rechercheParentCreation(pA a, int id);
 pA rechercheParent(pA a, int id);
-pA creationArbre(pA a, Elmt* elm, int info);
+pA creationArbre(pA a, Elmt* elm, int info, int mod);
 //pA creationFils (pA papa, pA enfant, int info);
 int profondeurDescendance (pA a);
 
@@ -52,9 +52,9 @@ pA appelRechercheParentModifEquilibre(pA a, int id);
 Pile * rechercheParentModifEquilibre(int id, Pile* pile);
 
 
-void traitementArbre(char* nomdufichier, int info);
-FILE * ouvertureFichierSortie(char* nomdufichierentree);
-void ecriture (FILE * fichier, pA arbre);
-void parcoursSufixeEcriture(FILE* fichier, pA arbre);
-void parcoursInfixeEcriture(FILE* fichier,pA arbre);
+void traitementArbre(char* nomdufichier, int info, int mod);
+FILE * ouvertureFichierSortie(char* nomdufichierentree, int info);
+void ecriture (FILE * fichier, pA arbre, int mod, int* num, int file);
+void parcoursSufixeEcriture(FILE* fichier, pA arbre, int mod, int * num, int file);
+void parcoursInfixeEcriture(FILE* fichier,pA arbre, int mod, int* num, int file);
 void parcoursInfixe(pA arbre);

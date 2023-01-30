@@ -8,8 +8,8 @@
 //commencer a chercher comment extraire les données du fichier pour l'incrémenter et faire le tri
 //mettre a jour le projet.h
 //continuer fonctions d'equilibrage et faire les fcts de pivot
-//finir traitement avl
-//finir la correction de compilation
+//finir implementation de touts les modes différents
+
 
 //fonctions manquantes pour les arbres: suppression d'un arbre
 
@@ -185,18 +185,15 @@ Pile * rechercheParentModifEquilibre(int id, Pile* pile){ //dans le cas ou un el
     }
     return pile;
 }
-pA creationArbre(pA a, Elmt* elm, int info){ //si la station existe dans l'arbre
+pA creationArbre(pA a, Elmt* elm, int info, int mod){ //si la station existe dans l'arbre
     pA tmp =rechercheParentCreation(a, elm->station);
-    printf("%d ", tmp->elmt->station);
-    printf("%d \n", elm->station);
+    //printf("%d ", tmp->elmt->station);
+    //printf("%d \n", elm->station);
     //printf("%d \n", &a);
     pA new= malloc(sizeof(Arbre));
     if(tmp->elmt !=NULL){
         if (tmp->elmt->station == elm->station){ //la station est deja presente dans le tableau
-        //|| tmp->fg->elmt->station == elm->station || tmp->fd->elmt->station == elm->station
-        //probleme ici: on ne fait que rentrer dans cette boucle.
-        //revoir fonctionnement de recherche parent creation et les conditions d'entree
-            //printf("test arbre station tmp");
+                    //printf("test arbre station tmp");
             tmp->elmt->somme = tmp->elmt->somme + elm->somme; //elm->somme est la valeur de la nouvelle donnée (somme de 1 elmt)
             tmp->elmt->nbelmt = tmp->elmt->nbelmt + elm->nbelmt; //elm->nbelmt est 1
             tmp->elmt->min = min(tmp->elmt->min, elm->min);
@@ -209,11 +206,11 @@ pA creationArbre(pA a, Elmt* elm, int info){ //si la station existe dans l'arbre
         if (tmp->elmt->station < elm->station){
             if(tmp->fd != NULL) exit(6); //code erreur a determiner
             tmp->fd = new;
-            printf("fils va a droite\n");
+            //printf("fils va a droite\n");
         }else{
             if(tmp->fg != NULL) exit(6); //code erreur a determiner
             tmp->fg = new;
-            printf("fils va a gauche\n");
+            //printf("fils va a gauche\n");
         }
         new -> elmt = elm;
         new->equilibre = 0;
@@ -253,7 +250,7 @@ pA verifEquilibre (pA a){ //renvoie le pivot: si l'arbre envoyé etait la racine
     if(!estVide(a)){
         if(absolu(a->equilibre)==2){
             if(a->equilibre == 2){ //trop lourd sur la droite -> rotation SG ou DG
-                printf("tout va bien\n");
+                //printf("tout va bien\n");
                 if(!estVide(a->fd)){
                     if(a->fd->equilibre == -1) a = rotationDG(a);
                     else a = rotationSG(a);
@@ -271,43 +268,68 @@ pA verifEquilibre (pA a){ //renvoie le pivot: si l'arbre envoyé etait la racine
 }
 
 //fonctions de modification de fichier
-FILE * ouvertureFichierSortie(char* nomdufichierentree){
+FILE * ouvertureFichierSortie(char* nomdufichierentree, int info){
+    //info correspond a l'appel de la fonction(premier ou deuxieme)
     //verifier la comparaison entre le nom du fichier en entree pour ne pas le supprimer en ouvrant celui en sortie
+    printf("test\n");
     FILE* fichier = NULL;
-    char * chaine = "sortietest.csv";
+    char * chaine;
+    if (info == 1)chaine = "ValeursRetours.csv";
+    if (info == 2)chaine = "ValeursIdReelles.csv";
     if (chaine != nomdufichierentree){
         fichier = fopen ( chaine, "w+");
 	    if (fichier == NULL)exit(6); //code erreur a determiner
     }else {
-        fichier = fopen ("sortiedufourbe.csv", "w+");
-        if (fichier == NULL) exit(6);
+        if (chaine == nomdufichierentree){
+            if(info == 1)fichier = fopen ("sortiedufourbe.csv", "w+");
+            if(info == 2)fichier = fopen("sortiedufourbeIDReelles","w+");
+        }
+        if (fichier == NULL) exit(6); //code erreur a determiner 
     }
     return fichier;
 }
-void parcoursSufixeEcriture(FILE* fichier, pA arbre){ //ecriture de l'arbre dans l'ordre croissant
+void parcoursSufixeEcriture(FILE* fichier, pA arbre, int mod, int * num, int file){ //ecriture de l'arbre dans l'ordre croissant
     if(!estVide(arbre)){
-        if(!estVide(arbre->fd)) parcoursSufixeEcriture(fichier,arbre->fd);
-        ecriture(fichier, arbre);
-        if(!estVide(arbre->fg)) parcoursSufixeEcriture(fichier,arbre->fg);
+        if(!estVide(arbre->fd)) parcoursSufixeEcriture(fichier,arbre->fd, mod, num, file);
+        ecriture(fichier, arbre, mod, num,file);
+        if(!estVide(arbre->fg)) parcoursSufixeEcriture(fichier,arbre->fg, mod, num, file);
     }
 }
-void parcoursInfixeEcriture(FILE* fichier,pA arbre){ //ecriture de l'arbre dans le tri croissant
+void parcoursInfixeEcriture(FILE* fichier,pA arbre, int mod, int* num, int file){ //ecriture de l'arbre dans le tri croissant
     if(!estVide(arbre)){
-        if(!estVide(arbre->fg)) parcoursInfixeEcriture(fichier,arbre->fg);
-        ecriture(fichier, arbre);
-        if(!estVide(arbre->fd)) parcoursInfixeEcriture(fichier,arbre->fd);
+        if(!estVide(arbre->fg)) parcoursInfixeEcriture(fichier,arbre->fg, mod, num, file);
+        ecriture(fichier, arbre, mod,num, file);
+        if(!estVide(arbre->fd)) parcoursInfixeEcriture(fichier,arbre->fd, mod, num, file);
     }
 }
-void ecriture (FILE * fichier, pA arbre){// arbre en entrée, ecrit dans le fichier les elements de pa dans l'ordre
+void ecriture (FILE * fichier, pA arbre, int mod, int * num, int file){// arbre en entrée, ecrit dans le fichier les elements de pa dans l'ordre
+    // *num est l'indice factice de la station
     //printf("%li \n", ftell(fichier));
-    fprintf(fichier, "%d;%f;%f;%f;\n", arbre->elmt->station, arbre->elmt->somme / arbre->elmt->nbelmt, arbre->elmt->min, arbre->elmt->max);
+    if (file == 1){
+        if(mod == 1)fprintf(fichier, "%d;%f;%f;%f;\n", *num, arbre->elmt->somme / arbre->elmt->nbelmt, arbre->elmt->min, arbre->elmt->max);
+        if (mod == 2);
+        if (mod == 3);
+        if (mod == 4);
+        if (mod == 5);
+        if (mod == 6);
+        *num = *num + 1;
+    }
+    if(file == 2){
+        if(mod == 1)fprintf(fichier, "%d;%f;%f;%f;\n", arbre->elmt->station, arbre->elmt->somme / arbre->elmt->nbelmt, arbre->elmt->min, arbre->elmt->max);
+        if (mod == 2);
+        if (mod == 3);
+        if (mod == 4);
+        if (mod == 5);
+        if (mod == 6);
+    }
 }
 
 //se renseigner sur feof
-void traitementArbre(char *  nomdufichier, int info){
+void traitementArbre(char *  nomdufichier, int info, int mod){
     FILE* fichierEntree = fopen(nomdufichier, "r");
-    FILE* fichierSortie = ouvertureFichierSortie(nomdufichier);
-    //printf("ok pour l'ouverture des fichiers \n");
+    FILE* fichierSortie1 = ouvertureFichierSortie(nomdufichier,1);
+    FILE* fichierSortie2 = ouvertureFichierSortie(nomdufichier,2);
+    printf("ok pour l'ouverture des fichiers \n");
     //info sera 1 pour tout
     int tmp2;
     pA arbre = malloc(sizeof(Arbre));
@@ -334,25 +356,35 @@ void traitementArbre(char *  nomdufichier, int info){
         tmp = malloc(sizeof(Elmt));
         fscanf(fichierEntree, "%d", &tmp->station);
         a = fgetc(fichierEntree);
-        if (a != '\n' &&a != EOF){
-          fseek(fichierEntree,SEEK_CUR,-1);
-          fscanf(fichierEntree, "%f", &tmp->somme);
-          //printf("%d, %f \n", tmp->station, tmp->somme);
-          tmp->nbelmt = 1;
-          tmp->min = tmp->somme;
-          tmp->max = tmp->somme;
-          //printf("avant creation arbre \n");
-          arbre = creationArbre(arbre, tmp, info);
-            //printf("ok jusqu'ici \n");
-        }
+        if(a != '\n' && a != EOF && a != ' ')
+            if (a != '\n' && a != EOF && a != ' '){
+              fseek(fichierEntree,SEEK_CUR,-2);
+              fscanf(fichierEntree, "%f", &tmp->somme);
+              //printf("%d, %f \n", tmp->station, tmp->somme);
+              tmp->nbelmt = 1;
+              tmp->min = tmp->somme;
+              tmp->max = tmp->somme;
+              //printf("avant creation arbre \n");
+              arbre = creationArbre(arbre, tmp, info, mod);
+                //printf("ok jusqu'ici \n");
+            }
       }
     }
     //printf("ok pour la creation de l'arbre \n");
     fclose(fichierEntree);
+    printf("arbre ok\n");
     //printf("%d est la racine de l'arbre \n" , arbre->elmt->station);
     //parcoursInfixe(arbre);
-    parcoursInfixeEcriture(fichierSortie, arbre);
-    //printf("ok pour l'ecriture \n");
+    if(mod == 1){
+        int* num = NULL;
+        int valeur = 0;
+        num = &valeur;
+        printf("%d\n", *num);
+        printf("%d\n", num);
+        parcoursInfixeEcriture(fichierSortie1, arbre, mod,num, 1);
+        parcoursInfixeEcriture(fichierSortie2, arbre, mod,num, 2);
+    }
+    printf("ok pour l'ecriture \n");
 }
 /*probleme a corriger: seule la derniere ligne du fichier est affiche dans le fichier de sortie.
 Cause possible: defaults dans la creation/gestion de l'arbre
@@ -361,23 +393,29 @@ pas ecriture (testé)*/
 
 //info = 1 veut dire qu'on utilise un avl
 int main (int argc, char *argv[]) {// a indique le mode souhaité entre AVL, ABR et tableau
+    printf("debut programme\n");
     char a = argv[1][0];
     char test = argv [1][1];
     if (test != '\0') exit (6); //code erreur a determiner
-    printf("a=%c\n",a);
+    test = argv[3][1];
+    if (test != '\0') exit (6); //code erreur a determiner
+    printf("%d\n", argv[3][0]);
+    test = argv[3][0];
+    if(test<'0' || test>'6') exit(6); //code a determiner
+    //printf("a=%c\n",a);
     //if (argv[2]==NULL) exit(6);//code a determiner
     int i= strlen(argv[2]);
     if (i == 0) exit(6); //code a determiner
     switch (a){
-        case ('1') :printf("1\n") ; //traitement en AVL
+        case ('1') ://printf("1\n") ; //traitement en AVL
         //printf("%s \n",argv[2]);
         //printf("ok jusqu'a la fin des tests des variables \n");
-        traitementArbre(argv[2],1);
+        traitementArbre(argv[2],1,argv[3][0]-48);
         break;
-        case ('2') :printf("2\n") ; //traitement en ABR
-        traitementArbre(argv[2],0);
+        case ('2') ://printf("2\n") ; //traitement en ABR
+        traitementArbre(argv[2],0,argv[3][0]-48); //-48 pour repasser a la valeur numerique (pas ascii)
         break;
-        case ('3') :printf("3\n")  ;//traitement en tableau
+        case ('3') ://printf("3\n")  ;//traitement en tableau
         break;
         default :
             printf("erreur dans l'option\n"); //ne devrait pas arriver car testé dans le script
@@ -556,26 +594,26 @@ int main (){
 
 
     arbre->elmt = element1;
-    arbre = creationArbre(arbre, element2, 1);
-    arbre = creationArbre(arbre, element3, 1);
-    arbre = creationArbre(arbre, element4, 1);
-    arbre = creationArbre(arbre, element5, 1);
-    arbre = creationArbre(arbre, element6, 1);
-    arbre = creationArbre(arbre, element7, 1);
-    arbre = creationArbre(arbre, element8, 1);
-    arbre = creationArbre(arbre, element9, 1);
-    arbre = creationArbre(arbre, element10, 1);
-    arbre = creationArbre(arbre, element11, 1);
-    arbre = creationArbre(arbre, element12, 1);
-    arbre = creationArbre(arbre, element13, 1);
-    arbre = creationArbre(arbre, element14, 1);
-    arbre = creationArbre(arbre, element15, 1);
-    arbre = creationArbre(arbre, element16, 1);
-    arbre = creationArbre(arbre, element17, 1);
-    arbre = creationArbre(arbre, element18, 1);
-    arbre = creationArbre(arbre, element19, 1);
-    arbre = creationArbre(arbre, element20, 1);
-    arbre = creationArbre(arbre, element21, 1);
+    arbre = creationArbre(arbre, element2, 1, mod);
+    arbre = creationArbre(arbre, element3, 1, mod);
+    arbre = creationArbre(arbre, element4, 1, mod);
+    arbre = creationArbre(arbre, element5, 1, mod);
+    arbre = creationArbre(arbre, element6, 1, mod);
+    arbre = creationArbre(arbre, element7, 1, mod);
+    arbre = creationArbre(arbre, element8, 1, mod);
+    arbre = creationArbre(arbre, element9, 1, mod);
+    arbre = creationArbre(arbre, element10, 1, mod);
+    arbre = creationArbre(arbre, element11, 1, mod);
+    arbre = creationArbre(arbre, element12, 1, mod);
+    arbre = creationArbre(arbre, element13, 1, mod);
+    arbre = creationArbre(arbre, element14, 1, mod);
+    arbre = creationArbre(arbre, element15, 1, mod);
+    arbre = creationArbre(arbre, element16, 1, mod);
+    arbre = creationArbre(arbre, element17, 1, mod);
+    arbre = creationArbre(arbre, element18, 1, mod);
+    arbre = creationArbre(arbre, element19, 1, mod);
+    arbre = creationArbre(arbre, element20, 1, mod);
+    arbre = creationArbre(arbre, element21, 1, mod);
     parcoursInfixe(arbre);
 
 }
