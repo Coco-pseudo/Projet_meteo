@@ -33,9 +33,9 @@ int descendance(pA a){
     }
     return 0;
 }
-pA rechercheParentCreation(pA a, int id){ //dans le cas ou un element est egal a celui que l'on cree, on renvoie sa localisation, sinon c le futur parent.
+pA rechercheParentCreation(pA a, long id){ //dans le cas ou un element est egal a celui que l'on cree, on renvoie sa localisation, sinon c le futur parent.
     //printf("%d, %d", &a, id);
-    //printf(" %d \n", a->elmt->station);
+    //printf(" %li \n", a->elmt->station);
     if(!estVide(a)){
         if(a->elmt != NULL){ //cas du premier element ajouté a l'arbre (ne devrait pas etre rencontré)
             if(id < a->elmt->station){
@@ -142,7 +142,7 @@ Pile * creationPile(pA a){
     nouveau -> suivant = NULL;
     return nouveau;
 }
-pA appelRechercheParentModifEquilibre(pA a, int id){
+pA appelRechercheParentModifEquilibre(pA a, long id){
     Pile * liste = malloc(sizeof(Pile));
     liste = creationPile(a);
     liste = rechercheParentModifEquilibre(id, liste);
@@ -159,7 +159,7 @@ pA appelRechercheParentModifEquilibre(pA a, int id){
     }
     return a;
 }
-Pile * rechercheParentModifEquilibre(int id, Pile* pile){ //dans le cas ou un element est egal a celui que l'on cree, on renvoie sa localisation, sinon c le futur parent.
+Pile * rechercheParentModifEquilibre(long id, Pile* pile){ //dans le cas ou un element est egal a celui que l'on cree, on renvoie sa localisation, sinon c le futur parent.
     if(!estVide(pile->arbre)){
         if(id < pile->arbre->elmt->station){
             if(!estVide(pile->arbre->fg)){
@@ -186,6 +186,8 @@ Pile * rechercheParentModifEquilibre(int id, Pile* pile){ //dans le cas ou un el
     return pile;
 }
 pA creationArbre(pA a, Elmt* elm, int info, int mod){ //si la station existe dans l'arbre
+    //printf("%li \n",elm->station);
+    //printf("%f \n", elm->somme);
     pA tmp =rechercheParentCreation(a, elm->station);
     //printf("%d ", tmp->elmt->station);
     //printf("%d \n", elm->station);
@@ -271,7 +273,7 @@ pA verifEquilibre (pA a){ //renvoie le pivot: si l'arbre envoyé etait la racine
 FILE * ouvertureFichierSortie(char* nomdufichierentree, int info){
     //info correspond a l'appel de la fonction(premier ou deuxieme)
     //verifier la comparaison entre le nom du fichier en entree pour ne pas le supprimer en ouvrant celui en sortie
-    printf("test\n");
+    //printf("test\n");
     FILE* fichier = NULL;
     char * chaine;
     if (info == 1)chaine = "ValeursRetours.csv";
@@ -306,8 +308,8 @@ void ecriture (FILE * fichier, pA arbre, int mod, int * num, int file){// arbre 
     // *num est l'indice factice de la station
     //printf("%li \n", ftell(fichier));
     if (file == 1){
-        if(mod == 1)fprintf(fichier, "%d;%f;%f;%f;\n", *num, arbre->elmt->somme / arbre->elmt->nbelmt, arbre->elmt->min, arbre->elmt->max);
-        if (mod == 2);
+        if(mod == 1)fprintf(fichier, "%li;%f;%f;%f;\n", *num, arbre->elmt->somme / arbre->elmt->nbelmt, arbre->elmt->min, arbre->elmt->max);
+        if (mod == 2)fprintf(fichier, "%li;%f;\n", *num, arbre->elmt->somme / arbre->elmt->nbelmt);
         if (mod == 3);
         if (mod == 4);
         if (mod == 5);
@@ -315,8 +317,8 @@ void ecriture (FILE * fichier, pA arbre, int mod, int * num, int file){// arbre 
         *num = *num + 1;
     }
     if(file == 2){
-        if(mod == 1)fprintf(fichier, "%d;%f;%f;%f;\n", arbre->elmt->station, arbre->elmt->somme / arbre->elmt->nbelmt, arbre->elmt->min, arbre->elmt->max);
-        if (mod == 2);
+        if(mod == 1)fprintf(fichier, "%li;%f;%f;%f;\n", arbre->elmt->station, arbre->elmt->somme / arbre->elmt->nbelmt, arbre->elmt->min, arbre->elmt->max);
+        if (mod == 2)fprintf(fichier, "%li;%f;\n", arbre->elmt->station, arbre->elmt->somme / arbre->elmt->nbelmt);
         if (mod == 3);
         if (mod == 4);
         if (mod == 5);
@@ -345,35 +347,46 @@ void traitementArbre(char *  nomdufichier, int info, int mod){
         //station;moyenne;min;max\n
         if(! feof(fichierEntree)){
             fscanf(fichierEntree, "%d", &elmt1->station);
-            a = fgetc(fichierEntree);
-            if(a != '\n' && a != EOF && a != ' '){
-                if (a != '\n' && a != EOF && a != ' '){
-                    fseek(fichierEntree,SEEK_CUR,-1);
-                    fscanf(fichierEntree, "%f", &elmt1->somme);
-                    //printf("%d, %f \n", tmp->station, tmp->somme);
-                    elmt1->nbelmt = 1;
-                    elmt1->min = tmp->somme;
-                    elmt1->max = tmp->somme;
-                    arbre->elmt = elmt1;
+            //printf("%d \n", elmt1->station);
+            //printf("%c \n", elmt1->station);
+            a = fgetc(fichierEntree);//passe le separateur
+            if(a != '\n' && a != EOF && a != ' '){ 
+                if(! feof(fichierEntree)){
+                    a = fgetc(fichierEntree); 
+                    if (a != '\n' && a != ' '){
+                        fseek(fichierEntree,SEEK_CUR,-1);
+                        fscanf(fichierEntree, "%f", &elmt1->somme);
+                        //printf("%d, %f \n", tmp->station, tmp->somme);
+                        elmt1->nbelmt = 1;
+                        elmt1->min = elmt1->somme;
+                        elmt1->max = elmt1->somme;
+                        arbre->elmt = elmt1;
+                    }
                 }
             }
         }
           //boucle generale
         while (! feof(fichierEntree)){ //boucle de creation de l'arbre
             tmp = malloc(sizeof(Elmt));
+            printf("boucle\n");
             fscanf(fichierEntree, "%d", &tmp->station);
-            a = fgetc(fichierEntree);
-            if(a != '\n' && a != EOF && a != ' '){
-                if (a != '\n' && a != EOF && a != ' '){
-                  fseek(fichierEntree,SEEK_CUR,-2);
-                  fscanf(fichierEntree, "%f", &tmp->somme);
-                  //printf("%d, %f \n", tmp->station, tmp->somme);
-                  tmp->nbelmt = 1;
-                  tmp->min = tmp->somme;
-                  tmp->max = tmp->somme;
-                  //printf("avant creation arbre \n");
-                  arbre = creationArbre(arbre, tmp, info, mod);
-                    //printf("ok jusqu'ici \n");
+            if(! feof(fichierEntree)){
+                a = fgetc(fichierEntree);//passe le separateur
+                if(a != '\n' && a != ' '){ 
+                    if(! feof(fichierEntree)){
+                        a = fgetc(fichierEntree); 
+                        if (a != '\n' && a != ' '){
+                            fseek(fichierEntree,SEEK_CUR,-1);
+                            fscanf(fichierEntree, "%f", &tmp->somme);
+                            printf("%d, %f \n", tmp->station, tmp->somme);
+                            tmp->nbelmt = 1;
+                            tmp->min = tmp->somme;
+                            tmp->max = tmp->somme;
+                            //printf("avant creation arbre \n");
+                            arbre = creationArbre(arbre, tmp, info, mod);
+                              //printf("ok jusqu'ici \n");
+                        }
+                    }
                 }
             }
         }
@@ -382,34 +395,100 @@ void traitementArbre(char *  nomdufichier, int info, int mod){
         //format: entree puis sortie
         // date/heure;variable\n
         //date/heure;moyenne\n
+        //partie du principe que on peut comparer les dates comme si ils etaient des entiers en ascii, a verifier
+        int i = 0;
+        int nvldate;
+        long date = 0;
+        int utc = 0;
+        char signe = 1; //prend 1 pour + et -1 pour -
+        int n = 0;
         if(! feof(fichierEntree)){
             //modifs a mettre ici pour convertir la date en entier
-            fscanf(fichierEntree, "%d", &elmt1->station);
-            a = fgetc(fichierEntree);
-            if (a != '\n' &&a != EOF){
-                fseek(fichierEntree,SEEK_CUR,-1);
-                fscanf(fichierEntree, "%f", &elmt1->somme);
-                //printf("%d, %f \n", tmp->station, tmp->somme);
-                elmt1->nbelmt = 1;
-                arbre->elmt = elmt1;
+            for(i=0; i<19; i++){
+                a = fgetc(fichierEntree);
+                nvldate= a;
+                //printf("nvldate = %d \n", nvldate);
+                if (!(nvldate < '0'|| nvldate > '9')){
+                    date = date * 10 + nvldate - 48;
+                    //printf("%d \n", nvldate - 48);
+                    //printf("%li \n", date);
+                    n++;
+                    //printf("iteration %d \n", n);
+                }
             }
-          //boucle generale
-        while (! feof(fichierEntree)){ //boucle de creation de l'arbre
-            tmp = malloc(sizeof(Elmt));
-            //modifs a mettre ici pour convertir la date en entier
-            fscanf(fichierEntree, "%d", &tmp->station);
             a = fgetc(fichierEntree);
-            if(a != '\n' && a != EOF && a != ' ')
-                if (a != '\n' && a != EOF && a != ' '){
-                  fseek(fichierEntree,SEEK_CUR,-2);
+            if(a == '+')signe = 1;
+            if(a == '-')signe == -1;
+            for(i=0; i<5; i++){
+                nvldate = fgetc(fichierEntree);
+                if (!(nvldate < '0'&& nvldate > '9')){
+                    utc = utc * 10 + nvldate - 48;
+                    printf("utc : %i \n");
+                }
+            }
+            //printf("utc = %d \n", utc);
+            //printf ("signe = %d \n", signe);
+            //printf("%d\n", date);
+            date = date + (signe * utc);
+            printf("%li \n", date);
+            
+            elmt1->station = date;
+            //a = fgetc(fichierEntree);//passe le separateur
+                //if (a != '\n' &&a != EOF && a!= ' '){
+                    fscanf(fichierEntree, "%f", &elmt1->somme);
+                    printf("%f \n", elmt1->somme);
+                    //printf("%d, %f \n", tmp->station, tmp->somme);
+                    elmt1->nbelmt = 1;
+                    arbre->elmt = elmt1;
+                //}
+        }
+          //boucle generale
+        /*while*/ if (! feof(fichierEntree)){ //boucle de creation de l'arbre
+            tmp = malloc(sizeof(Elmt));
+            printf("entree dans ma boucle\n");
+            //modifs a mettre ici pour convertir la date en entier
+            date = 0;
+            utc = 0;
+            for(i=0; i<19; i++){
+                a = fgetc(fichierEntree);
+                nvldate= a;
+                if (!(nvldate < '0'|| nvldate > '9')){
+                    date = date * 10 + nvldate -48;
+                    n++;
+                    printf("%li \n",date);
+                    //printf("iteration %d \n", n);
+                }
+            }
+            a = fgetc(fichierEntree);
+            if(a == '+')signe = 1;
+            if(a == '-')signe == -1;
+            printf("%d signe\n");
+            for(i=0; i<5; i++){
+                nvldate = fgetc(fichierEntree);
+                printf("nvldate : %d\n");
+                if (!(nvldate < '0'&& nvldate > '9')){
+                    utc = utc * 10 + nvldate -48;
+                    printf("utc = %i\n");
+                }
+            }
+            printf("utc : %d\n ",utc);
+            date = date + signe * utc;
+            printf("date : %li \n", date);
+            tmp->station = date;
+            //a = fgetc(fichierEntree);
+            //if(a != '\n' && a != EOF && a != ' '){
+                //if (a != '\n' && a != EOF && a != ' '){
+                  //fseek(fichierEntree,SEEK_CUR,-1);
                   fscanf(fichierEntree, "%f", &tmp->somme);
-                  //printf("%d, %f \n", tmp->station, tmp->somme);
+
+                    printf("elmt : %f \n", tmp->somme);
+                  //printf("%li, %f \n", tmp->station, tmp->somme);
                   tmp->nbelmt = 1;
                   //printf("avant creation arbre \n");
                   arbre = creationArbre(arbre, tmp, info, mod);
                     //printf("ok jusqu'ici \n");
-                }
-            }
+                //}
+            //}
         }
     }
     if(mod == 3){ //boucle pour le tri 3
@@ -478,32 +557,49 @@ void traitementArbre(char *  nomdufichier, int info, int mod){
         }
     }
     if(mod == 5){ //boucle pour le tri 5
+    //tri selon l'humidité, longitude et lattitude
         if(! feof(fichierEntree)){
-            //modifs a mettre ici pour convertir la date en entier
-            fscanf(fichierEntree, "%d", &elmt1->station);
-            a = fgetc(fichierEntree);
-            if (a != '\n' &&a != EOF){
-                fseek(fichierEntree,SEEK_CUR,-1);
-                fscanf(fichierEntree, "%f", &elmt1->somme);
-                //printf("%d, %f \n", tmp->station, tmp->somme);
-                elmt1->nbelmt = 1;
-                arbre->elmt = elmt1;
+            fscanf(fichierEntree, "%d", &elmt1->station); //humidité
+            //printf("%d \n", elmt1->station);
+            //printf("%c \n", elmt1->station);
+            a = fgetc(fichierEntree);//passe le separateur
+            if(a != '\n' && a != EOF && a != ' '){ 
+                if(! feof(fichierEntree)){
+                    a = fgetc(fichierEntree); 
+                    if (a != '\n' && a != ' '){
+                        fseek(fichierEntree,SEEK_CUR,-1);
+                        fscanf(fichierEntree, "%f", &elmt1->somme);//longitude
+                        fscanf(fichierEntree, "%f", &elmt1->min); //lattitude
+                        //printf("%d, %f \n", tmp->station, tmp->somme);
+                        elmt1->nbelmt = 1;
+                        elmt1->max = elmt1->somme;
+                        arbre->elmt = elmt1;
+                    }
+                }
             }
+        }
           //boucle generale
         while (! feof(fichierEntree)){ //boucle de creation de l'arbre
             tmp = malloc(sizeof(Elmt));
-            //modifs a mettre ici pour convertir la date en entier
+            printf("boucle\n");
             fscanf(fichierEntree, "%d", &tmp->station);
-            a = fgetc(fichierEntree);
-            if(a != '\n' && a != EOF && a != ' ')
-                if (a != '\n' && a != EOF && a != ' '){
-                  fseek(fichierEntree,SEEK_CUR,-2);
-                  fscanf(fichierEntree, "%f", &tmp->somme);
-                  //printf("%d, %f \n", tmp->station, tmp->somme);
-                  tmp->nbelmt = 1;
-                  //printf("avant creation arbre \n");
-                  arbre = creationArbre(arbre, tmp, info, mod);
-                    //printf("ok jusqu'ici \n");
+            if(! feof(fichierEntree)){
+                a = fgetc(fichierEntree);//passe le separateur
+                if(a != '\n' && a != ' '){ 
+                    if(! feof(fichierEntree)){
+                        a = fgetc(fichierEntree); 
+                        if (a != '\n' && a != ' '){
+                            fseek(fichierEntree,SEEK_CUR,-1);
+                            fscanf(fichierEntree, "%f", &tmp->somme);
+                            fscanf(fichierEntree, "%f", &tmp->min)
+                            printf("%d, %f \n", tmp->station, tmp->somme);
+                            tmp->nbelmt = 1;
+                            tmp->max = tmp->somme;
+                            //printf("avant creation arbre \n");
+                            arbre = creationArbre(arbre, tmp, info, mod);
+                              //printf("ok jusqu'ici \n");
+                        }
+                    }
                 }
             }
         }
@@ -541,10 +637,10 @@ void traitementArbre(char *  nomdufichier, int info, int mod){
     }
     //printf("ok pour la creation de l'arbre \n");
     fclose(fichierEntree);
-    printf("arbre ok\n");
+    //printf("arbre ok\n");
     //printf("%d est la racine de l'arbre \n" , arbre->elmt->station);
     //parcoursInfixe(arbre);
-    if(mod == 1){
+    if(mod == 1 || mod == 2){
         int* num = NULL;
         int valeur = 0;
         num = &valeur;
@@ -553,7 +649,10 @@ void traitementArbre(char *  nomdufichier, int info, int mod){
         parcoursInfixeEcriture(fichierSortie1, arbre, mod,num, 1);
         parcoursInfixeEcriture(fichierSortie2, arbre, mod,num, 2);
     }
-    printf("ok pour l'ecriture \n");
+
+    //printf("ok pour l'ecriture \n");
+    fclose(fichierSortie1);
+    fclose(fichierSortie2);
 }
 /*probleme a corriger: seule la derniere ligne du fichier est affiche dans le fichier de sortie.
 Cause possible: defaults dans la creation/gestion de l'arbre
@@ -562,13 +661,13 @@ pas ecriture (testé)*/
 
 //info = 1 veut dire qu'on utilise un avl
 int main (int argc, char *argv[]) {// a indique le mode souhaité entre AVL, ABR et tableau
-    printf("debut programme\n");
+    //printf("debut programme\n");
     char a = argv[1][0];
     char test = argv [1][1];
     if (test != '\0') exit (6); //code erreur a determiner
     test = argv[3][1];
     if (test != '\0') exit (6); //code erreur a determiner
-    printf("%d\n", argv[3][0]);
+    //printf("%d\n", argv[3][0]);
     test = argv[3][0];
     if(test<'0' || test>'6') exit(6); //code a determiner
     //printf("a=%c\n",a);
@@ -591,6 +690,7 @@ int main (int argc, char *argv[]) {// a indique le mode souhaité entre AVL, ABR
             exit(1);
             break;
     }
+    printf("done c \n");
     return 0;
 
 }
@@ -784,7 +884,20 @@ int main (){
     arbre = creationArbre(arbre, element20, 1, mod);
     arbre = creationArbre(arbre, element21, 1, mod);
     parcoursInfixe(arbre);
-
+    return 0 ;
 }
 
+*/
+// test du scanf
+/*
+int main(int argc, char *argv[]){
+    FILE * fichierEntree = fopen(argv[1],"r");
+    FILE * fichierSortie = ouvertureFichierSortie(argv[1], 1);
+    int a =0;
+    fscanf(fichierEntree, "%d", &a);
+    fprintf(fichierSortie, "%d",a);
+    a = fgetc(fichierEntree);
+    fprintf(fichierSortie, "%d",a);
+    return 0;
+}
 */
