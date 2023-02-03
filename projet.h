@@ -24,6 +24,9 @@ typedef struct pile{
     int modif;
 }Pile;
 
+//===========================================================================
+//projet.c
+
 //fonctions generales
 type absolu (type a);
 type max(type a, type b);
@@ -54,7 +57,20 @@ Pile * rechercheParentModifEquilibre(long id, Pile* pile);
 
 void traitementArbre(char* nomdufichier, int info, int mod);
 FILE * ouvertureFichierSortie(char* nomdufichierentree, int info);
-void ecriture (FILE * fichier, pA arbre, int mod, int* num, int file);
+void ecriture (FILE * fichier, Elmt * elmt, int mod, int* num, int file);
 void parcoursSufixeEcriture(FILE* fichier, pA arbre, int mod, int * num, int file);
 void parcoursInfixeEcriture(FILE* fichier,pA arbre, int mod, int* num, int file);
 void parcoursInfixe(pA arbre);
+
+//===========================================================================================
+//tableau.c
+
+Elmt ** creationTableau();
+int rechercheDichotomique(Elmt * Tableau[70], Elmt * elmt, int mod, int * maximum);
+Elmt ** decalageTableau(int debut, Elmt * Tableau[70]);
+Elmt ** ajoutElmtTableau(Elmt * Tableau [70], Elmt * elmt, int mod, int * maximum);
+Elmt * scanElmt(FILE * fichier, int mod);
+void parcoursCroissantTableauEcriture(FILE* fichier, Elmt * Tableau [70],int mod, int file);
+void parcoursDecroissantTableauEcriture(FILE* fichier, Elmt * Tableau [70],int mod, int file);
+Elmt ** traitementTableau(FILE* fichier, Elmt * Tableau[70] ,int mod);
+void appelTraitementTableau(char* nomdufichier, int mod);

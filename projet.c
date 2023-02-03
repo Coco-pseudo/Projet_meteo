@@ -311,7 +311,7 @@ FILE * ouvertureFichierSortie(char* nomdufichierentree, int info){
     }else {
         if (chaine == nomdufichierentree){
             if(info == 2)fichier = fopen ("sortiedufourbe.csv", "w+");
-            if(info == 1)fichier = fopen("sortiedufourbeIDReelles","w+");
+            if(info == 1)fichier = fopen ("sortiedufourbeIDReelles","w+");
         }
         if (fichier == NULL) exit(6); //code erreur a determiner 
     }
@@ -320,45 +320,45 @@ FILE * ouvertureFichierSortie(char* nomdufichierentree, int info){
 void parcoursSufixeEcriture(FILE* fichier, pA arbre, int mod, int * num, int file){ //ecriture de l'arbre dans l'ordre croissant
     if(!estVide(arbre)){
         if(!estVide(arbre->fd)) parcoursSufixeEcriture(fichier,arbre->fd, mod, num, file);
-        ecriture(fichier, arbre, mod, num,file);
+        ecriture(fichier, arbre->elmt, mod, num,file);
         if(!estVide(arbre->fg)) parcoursSufixeEcriture(fichier,arbre->fg, mod, num, file);
     }
 }
 void parcoursInfixeEcriture(FILE* fichier,pA arbre, int mod, int* num, int file){ //ecriture de l'arbre dans le tri croissant
     if(!estVide(arbre)){
         if(!estVide(arbre->fg)) parcoursInfixeEcriture(fichier,arbre->fg, mod, num, file);
-        printf("avant ecriture \n");
-        ecriture(fichier, arbre, mod,num, file);
-        printf("après ecriture \n");
+        ecriture(fichier, arbre->elmt, mod,num, file);
         if(!estVide(arbre->fd)) parcoursInfixeEcriture(fichier,arbre->fd, mod, num, file);
     }
 }
-void ecriture (FILE * fichier, pA arbre, int mod, int * num, int file){// arbre en entrée, ecrit dans le fichier les elements de pa dans l'ordre
+void ecriture (FILE * fichier, Elmt * elmt, int mod, int * num, int file){// arbre en entrée, ecrit dans le fichier les elements de pa dans l'ordre
     // *num est l'indice factice de la station
     //printf("%li \n", ftell(fichier));
     //mod 5 sortie : longitude; latitude ; humidité
     if (file == 2){ //Valeurretours
         //identique a l'autre fichier pour 5 et 6
         //printf("test\n");
-        //printf("%f;%f;%f;\n", arbre->elmt->somme, arbre->elmt->min, arbre->elmt->max);
+        //printf("%f;%f;%f;\n", elmt->somme, elmt->min, elmt->max);
         
-        if (mod == 1)fprintf(fichier, "%li;%f;%f;%f;\n", *num, arbre->elmt->somme / arbre->elmt->nbelmt, arbre->elmt->min, arbre->elmt->max);
-        if (mod == 2)fprintf(fichier, "%li;%f;\n", *num, arbre->elmt->somme / arbre->elmt->nbelmt);
+        if (mod == 1)fprintf(fichier, "%li;%f;%f;%f;\n", *num, elmt->somme / elmt->nbelmt, elmt->min, elmt->max);
+        if (mod == 2)fprintf(fichier, "%li;%f;\n", *num, elmt->somme / elmt->nbelmt);
         if (mod == 3);
         if (mod == 4);
-        if (mod == 5)fprintf(fichier, "%f;%f;%f;\n", arbre->elmt->max, arbre->elmt->somme, arbre->elmt->min);
+        if (mod == 5)fprintf(fichier, "%f;%f;%f;\n", elmt->max, elmt->somme, elmt->min);
         if (mod == 6);
+        if (mod == 7)fprintf(fichier, "%f;%f;%f;\n", elmt->max, elmt->somme, elmt->min);
         //printf("?\n");
         *num = *num + 1;
     }
     if(file == 1){ //valeuridreelle
-        printf("%f;%f;%f;\n", arbre->elmt->somme, arbre->elmt->min, arbre->elmt->max);
-        if (mod == 1)fprintf(fichier, "%li;%f;%f;%f;\n", arbre->elmt->station, arbre->elmt->somme / arbre->elmt->nbelmt, arbre->elmt->min, arbre->elmt->max);
-        if (mod == 2)fprintf(fichier, "%li;%f;\n", arbre->elmt->station, arbre->elmt->somme / arbre->elmt->nbelmt);
+        //printf("%f;%f;%f;\n", elmt->somme, elmt->min, elmt->max);
+        if (mod == 1)fprintf(fichier, "%li;%f;%f;%f\n", elmt->station, elmt->somme / elmt->nbelmt, elmt->min, elmt->max);
+        if (mod == 2)fprintf(fichier, "%li;%f\n", elmt->station, elmt->somme / elmt->nbelmt);
         if (mod == 3);
         if (mod == 4);
-        if (mod == 5)fprintf(fichier, "%f;%f;%f;\n", arbre->elmt->max, arbre->elmt->somme, arbre->elmt->min);
+        if (mod == 5)fprintf(fichier, "%f;%f;%f\n", elmt->max, elmt->somme, elmt->min);
         if (mod == 6);
+        if (mod == 7)fprintf(fichier, "%f;%f;%f;\n", elmt->max, elmt->somme, elmt->min);
     }
 }
 
@@ -540,11 +540,11 @@ void traitementArbre(char *  nomdufichier, int info, int mod){
     }
     if(mod == 5){ //boucle pour le tri 5
         //tri selon station, humidité, longitude et lattitude
-        printf("debut du mod5\n");
+        //printf("debut du mod5\n");
         if(! feof(fichierEntree)){
             rewind(fichierEntree);
             fscanf(fichierEntree, "%d", &elmt1->station);
-            printf("%d \n", elmt1->station);
+            //printf("%d \n", elmt1->station);
             //printf("%c \n", elmt1->station);
             if(! feof(fichierEntree)){
                 a = fgetc(fichierEntree); 
@@ -591,7 +591,7 @@ void traitementArbre(char *  nomdufichier, int info, int mod){
                             //printf("%c\n", a);
                             fscanf(fichierEntree, "%f", &tmp->min);
                             //printf("%f \n", tmp->min);
-                            printf("%d, %f \n", tmp->station, tmp->somme);
+                            //printf("%d, %f \n", tmp->station, tmp->somme);
                             tmp->nbelmt = 1;
                             arbre = creationArbre(arbre, tmp, info, mod);
                         }
@@ -672,57 +672,17 @@ void traitementArbre(char *  nomdufichier, int info, int mod){
     parcoursInfixeEcriture(fichierSortie1, arbre, mod,num, 1);
     if(mod == 5 || mod == 6){
         fseek(fichierSortie1,SEEK_SET,0);
-        pA arbre2 = malloc(sizeof(Arbre));
-        elmt1 = malloc(sizeof(Arbre));
-        if(! feof(fichierSortie1)){
-            fscanf(fichierSortie1, "%f", &elmt1->max);// prend la longitude
-            //printf("%d \n", elmt1->station);
-            //printf("%c \n", elmt1->station);
-            if(! feof(fichierSortie1)){
-                a = fgetc(fichierSortie1); 
-                if (a != '\n' && a != ' '){
-                    fseek(fichierSortie1,SEEK_CUR,-1);
-                    fscanf(fichierSortie1, "%f", &elmt1->somme); //prend la lattitude
-                    a = fgetc(fichierSortie1);
-                    if(a != '\n' && a != EOF && a != ' '){
-                        fseek(fichierSortie1,SEEK_CUR,-1);
-                        fscanf(fichierSortie1, "%f", &elmt1->min);//prend l'humidite
-                        arbre2->elmt = elmt1;
-                    }
-                }
-            }
-            
-        }
-          //boucle generale
-        while (! feof(fichierSortie1)){ //boucle de creation de l'arbre
-            
-            tmp = malloc(sizeof(Elmt));
-            //printf("boucle\n");
-            fscanf(fichierSortie1, "%d", &tmp->max);
-            if(! feof(fichierSortie1)){
-                a = fgetc(fichierSortie1); 
-                if (a != '\n' && a != ' '){
-                    fseek(fichierSortie1,SEEK_CUR,-1);
-                    fscanf(fichierSortie1, "%f", &tmp->somme);
-                    a = fgetc(fichierSortie1);
-                    if(a != '\n' && a != EOF && a != ' '){
-                        fseek(fichierSortie1,SEEK_CUR,-1);
-                        fscanf(fichierSortie1, "%f", &tmp->min);
-                        //printf("%f \n", tmp->somme);
-                        //printf("%c\n", a);
-                        //printf("%f \n", tmp->min);
-                        //printf("%d, %f \n", tmp->station, tmp->somme);
-                        tmp->nbelmt = 1;
-                        arbre2 = creationArbre(arbre2, tmp, info, 7);// mod = 7 pour trie en fonction du min
-                    
-                    }
-                }
-            }
-        }
+        Elmt ** Tableau = creationTableau();
+        Tableau = traitementTableau(fichierSortie1, Tableau, 7);
         fclose(fichierSortie1);
         FILE * fichierSortie3 = ouvertureFichierSortie(nomdufichier,1);
-        parcoursInfixeEcriture(fichierSortie3, arbre, mod, num, 1);
-        parcoursInfixeEcriture(fichierSortie2, arbre, mod, num, 2);
+        for(int i=0; i< 70; i++){
+            if(Tableau[i]!=NULL){
+                printf("%f, %f, %f\n", Tableau[i]->min, Tableau[i]->somme , Tableau[i]->max);
+            }
+        }
+        parcoursDecroissantTableauEcriture(fichierSortie3,Tableau,7,1);
+        parcoursDecroissantTableauEcriture(fichierSortie2,Tableau,7,2);
     }else{
         parcoursInfixeEcriture(fichierSortie2, arbre, mod, num, 2);
         //printf("ok pour l'ecriture \n");
@@ -760,6 +720,7 @@ int main (int argc, char *argv[]) {// a indique le mode souhaité entre AVL, ABR
         traitementArbre(argv[2],0,argv[3][0]-48); //-48 pour repasser a la valeur numerique (pas ascii)
         break;
         case ('3') ://printf("3\n")  ;//traitement en tableau
+        appelTraitementTableau(argv[2],argv[3][0]-48);
         break;
         default :
             printf("erreur dans l'option\n"); //ne devrait pas arriver car testé dans le script
@@ -769,7 +730,7 @@ int main (int argc, char *argv[]) {// a indique le mode souhaité entre AVL, ABR
     printf("done c \n");
     return 0;
 
-}
+}//*/
 
 
 void parcoursInfixe(pA arbre){
@@ -800,7 +761,10 @@ int main (){
     Elmt * element11 = malloc (sizeof(Elmt));
     Elmt * element12 = malloc (sizeof(Elmt));
     Elmt * element13 = malloc (sizeof(Elmt));
-    Elmt * element14 = malloc (sizeof(Elmt));
+    Elmt * elemenraitementTableau
+7558 
+� 
+t14 = malloc (sizeof(Elmt));
     Elmt * element15 = malloc (sizeof(Elmt));
     Elmt * element16 = malloc (sizeof(Elmt));
     Elmt * element17 = malloc (sizeof(Elmt));
@@ -965,15 +929,42 @@ int main (){
 
 */
 // test du scanf
-/*
-int main(int argc, char *argv[]){
-    FILE * fichierEntree = fopen(argv[1],"r");
+
+/*int main(int argc, char *argv[]){
+    /*FILE * fichierEntree = fopen(argv[1],"r");
     FILE * fichierSortie = ouvertureFichierSortie(argv[1], 1);
     int a =0;
     fscanf(fichierEntree, "%d", &a);
     fprintf(fichierSortie, "%d",a);
     a = fgetc(fichierEntree);
     fprintf(fichierSortie, "%d",a);
+    //test tableau
+    Elmt ** Tableau=creationTableau();
+    int n = -1;
+    printf("debut\n");
+    for(int i=0; i<8;i++){
+        printf("i = %d\n", i);
+        Tableau[i]->station = i;
+        Tableau[i]->somme = i;
+        Tableau[i]->nbelmt = 1;
+        printf("%d, %f, %d \n",Tableau[i]->station,Tableau[i]->somme,Tableau[i]->nbelmt);
+        n++;
+    }
+    printf("test\n");
+    int valeur = n;
+    int * max = &valeur;
+    printf("%d, %d\n", *max, valeur);
+    Elmt * testdecalage = malloc(sizeof(Elmt));
+    if(Tableau[valeur]== NULL)printf("pb\n");
+    Elmt * elm = malloc(sizeof(Elmt));
+    elm->station = 3;
+    elm->somme = 1;
+    elm->nbelmt = 1;
+    Tableau = ajoutElmtTableau(Tableau,elm,1,max);
+    for(int i=0; i< 70; i++){
+        if(Tableau[i]!=NULL){
+            printf("%d, %f\n", Tableau[i]->station, Tableau[i]->somme / Tableau[i]->nbelmt);
+        }
+    }
     return 0;
-}
-*/
+}*/
