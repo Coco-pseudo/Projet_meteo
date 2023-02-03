@@ -20,7 +20,7 @@ Le contenu est le suivant :
 	
 	-Le fichier txt : help.txt
 	
-	-Le fichier csv : meteo_filtered_data_v1.csv 
+	-Le fichier csv : meteo_filtered_data_v1.csv (NON PRESENT DANS LE GITHUB)
 	
 	-Ce fichier : README.txt
 	
