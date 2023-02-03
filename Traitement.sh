@@ -5,12 +5,10 @@ Ftab="tableau.c"
 
 
 
-if [  -d Data/ ]
-then 
-    rm -r Data/ 
+if [ ! -d Data/ ]
+then
+	mkdir Data/
 fi
-mkdir Data/
-
 
 while getopts ":t:p:whmL:T:f:" opt
 
