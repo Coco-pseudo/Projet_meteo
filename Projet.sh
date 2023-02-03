@@ -10,6 +10,10 @@ FC="projetV2.c"
 FH="projetV2.h"
 Ftab="tableau.c"
 
+if [  -d Data/ ]
+then 
+    rm -r Data/ 
+fi
 
 #-----------------------------------------------------------------------------------------------------------------
 #-----------------Verif tous les fichiers sont présent avant de commencer-----------------------------------------
