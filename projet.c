@@ -188,41 +188,39 @@ Pile * rechercheParentModifEquilibre(int id, Pile* pile){ //dans le cas ou un el
 }
 pA creationArbre(pA a, Elmt* elm, int info, int mod){ //si la station existe dans l'arbre
     if(mod == 1){
-        //printf("%d \n",elm->station);
-        //printf("%f \n", elm->somme);
         pA tmp =rechercheParentCreation(a, elm->station);
         //printf("%d ", tmp->elmt->station);
         //printf("%d \n", elm->station);
         //printf("%d \n", &a);
         pA new= malloc(sizeof(Arbre));
         if(tmp->elmt !=NULL){
-            if (tmp->elmt->station == elm->station){ //la station est deja presente dans le tableau
-                        //printf("test arbre station tmp");
-                tmp->elmt->somme = tmp->elmt->somme + elm->somme; //elm->somme est la valeur de la nouvelle donnée (somme de 1 elmt)
-                tmp->elmt->nbelmt = tmp->elmt->nbelmt + elm->nbelmt; //elm->nbelmt est 1
-                tmp->elmt->min = min(tmp->elmt->min, elm->min);
-                tmp->elmt->max = max(tmp->elmt->max, elm->max);
-                return a;
-            }else{
-            if (info == 1){ //info = 1 veut dire qu'on utilise un avl
-                a = appelRechercheParentModifEquilibre(a,elm->station); //modifier la fonction pour faire un parcour qui modifie des enfants vers les parents(genre une file)
-            }
-            if (tmp->elmt->station < elm->station){
-                if(tmp->fd != NULL) exit(6); //code erreur a determiner
-                tmp->fd = new;
-                //printf("fils va a droite\n");
-            }else{
-                if(tmp->fg != NULL) exit(6); //code erreur a determiner
-                tmp->fg = new;
-                //printf("fils va a gauche\n");
-            }
-            new -> elmt = elm;
-            new->equilibre = 0;
-            new->fg = NULL ;
-            new->fd = NULL ;
+        if (tmp->elmt->station == elm->station){ //la station est deja presente dans le tableau
+                    //printf("test arbre station tmp");
+            tmp->elmt->somme = tmp->elmt->somme + elm->somme; //elm->somme est la valeur de la nouvelle donnée (somme de 1 elmt)
+            tmp->elmt->nbelmt = tmp->elmt->nbelmt + elm->nbelmt; //elm->nbelmt est 1
+            tmp->elmt->min = min(tmp->elmt->min, elm->min);
+            tmp->elmt->max = max(tmp->elmt->max, elm->max);
             return a;
-            }
+        }else{
+        if (info == 1){ //info = 1 veut dire qu'on utilise un avl
+            a = appelRechercheParentModifEquilibre(a,elm->station); //modifier la fonction pour faire un parcour qui modifie des enfants vers les parents(genre une file)
         }
+        if (tmp->elmt->station < elm->station){
+            if(tmp->fd != NULL) exit(6); //code erreur a determiner
+            tmp->fd = new;
+            //printf("fils va a droite\n");
+        }else{
+            if(tmp->fg != NULL) exit(6); //code erreur a determiner
+            tmp->fg = new;
+            //printf("fils va a gauche\n");
+        }
+        new -> elmt = elm;
+        new->equilibre = 0;
+        new->fg = NULL ;
+        new->fd = NULL ;
+        return a;
+        }
+    }
     }
     if(mod == 4){
         //printf("test\n");
@@ -438,25 +436,19 @@ void traitementArbre(char *  nomdufichier, int info, int mod){
           //boucle generale
         while (! feof(fichierEntree)){ //boucle de creation de l'arbre
             tmp = malloc(sizeof(Elmt));
-            //printf("boucle\n");
             fscanf(fichierEntree, "%d", &tmp->station);
-            if(! feof(fichierEntree)){
-                a = fgetc(fichierEntree);//passe le separateur
-                if(a != '\n' && a != ' '){ 
-                    if(! feof(fichierEntree)){
-                        a = fgetc(fichierEntree); 
-                        if (a != '\n' && a != ' '){
-                            fseek(fichierEntree,SEEK_CUR,-1);
-                            fscanf(fichierEntree, "%f", &tmp->somme);
-                            //printf("%d, %f \n", tmp->station, tmp->somme);
-                            tmp->nbelmt = 1;
-                            tmp->min = tmp->somme;
-                            tmp->max = tmp->somme;
-                            //printf("avant creation arbre \n");
-                            arbre = creationArbre(arbre, tmp, info, mod);
-                            //printf("ok jusqu'ici \n");
-                        }
-                    }
+            a = fgetc(fichierEntree);
+            if(a != '\n' && a != EOF && a != ' '){
+                if (a != '\n' && a != EOF && a != ' '){
+                  fseek(fichierEntree,SEEK_CUR,-2);
+                  fscanf(fichierEntree, "%f", &tmp->somme);
+                  //printf("%d, %f \n", tmp->station, tmp->somme);
+                  tmp->nbelmt = 1;
+                  tmp->min = tmp->somme;
+                  tmp->max = tmp->somme;
+                  //printf("avant creation arbre \n");
+                  arbre = creationArbre(arbre, tmp, info, mod);
+                    //printf("ok jusqu'ici \n");
                 }
             }
         }
