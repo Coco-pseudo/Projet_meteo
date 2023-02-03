@@ -69,7 +69,7 @@ Les options disponibles :
 	-F , pour restreindre les données au stations situées en France métropolitaine 
 	et en Corse
 
-	-G , pour restreindre les données au stations situées en Guyanne Francaise
+	-G , pour restreindre les données au stations situées en Guyanne Francaise (BIENTOT DISPONIBLE)
 	
 	
 	
@@ -116,7 +116,7 @@ Le script pourra retourner un code erreur en fonction de la situation:
 		
 		
 		2 : Erreur liée a un problème d'option (option/argument inconnu, 
-		insufisant ou trop d'option)
+		insufisant ou trop d'option/arguments)
 		
 		
 		3 : Erreur liée aux fichiers present dans le répertoire(Absent, mal nommé)
