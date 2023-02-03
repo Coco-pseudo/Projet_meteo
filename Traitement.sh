@@ -1,6 +1,6 @@
 #!/bin/bash
-FC="projetV2.c"
-FH="projetV2.h"
+FC="projet.c"
+FH="projet.h"
 Ftab="tableau.c"
 
 
