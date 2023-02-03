@@ -9,6 +9,8 @@ typedef struct element{
     float max;
     float somme;
     int nbelmt;
+    float somme2;
+    int nbelmt2;
     long station; //peut contenir la date comme chaine de caractere
 }Elmt;
 typedef struct arbre {
@@ -66,6 +68,8 @@ void parcoursInfixe(pA arbre);
 //tableau.c
 
 Elmt ** creationTableau();
+int maxint(int a, int b);
+int minint(int a, int b);
 int rechercheDichotomique(Elmt * Tableau[70], Elmt * elmt, int mod, int * maximum);
 Elmt ** decalageTableau(int debut, Elmt * Tableau[70]);
 Elmt ** ajoutElmtTableau(Elmt * Tableau [70], Elmt * elmt, int mod, int * maximum);

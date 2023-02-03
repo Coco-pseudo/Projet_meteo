@@ -34,7 +34,8 @@ int descendance(pA a){
     return 0;
 }
 pA rechercheParentCreation(pA a, long id){ //dans le cas ou un element est egal a celui que l'on cree, on renvoie sa localisation, sinon c le futur parent.
-    //printf("%d, %d", &a, id);
+    //if(estVide(a))printf("fuck you\n");
+    //printf("%li, %d\n", a->elmt->station, id);
     //printf(" %li \n", a->elmt->station);
     if(!estVide(a)){
         if(a->elmt != NULL){ //cas du premier element ajouté a l'arbre (ne devrait pas etre rencontré)
@@ -223,6 +224,39 @@ pA creationArbre(pA a, Elmt* elm, int info, int mod){ //si la station existe dan
             }
         }
     }
+    if(mod == 4){
+        //printf("test\n");
+        pA tmp = rechercheParentCreation(a,elm->station);
+        //printf("%d, %d \n", tmp->elmt->station, elm->station );
+        if(tmp->elmt != NULL){
+            if(tmp->elmt->station == elm->station){
+                tmp->elmt->somme = tmp->elmt->somme + elm->somme;
+                tmp->elmt->nbelmt = tmp->elmt->nbelmt + elm->nbelmt;
+                tmp->elmt->somme2 = tmp->elmt->somme2 + elm->somme2;
+                tmp->elmt->nbelmt2 = tmp->elmt->nbelmt2 + elm->nbelmt2;
+            }else{
+                if (info == 1){ //info = 1 veut dire qu'on utilise un avl
+                    a = appelRechercheParentModifEquilibre(a,elm->station); //modifier la fonction pour faire un parcour qui modifie des enfants vers les parents(genre une file)
+                }
+                pA new = malloc(sizeof(Arbre));
+                if (tmp->elmt->station < elm->station){
+                    if(tmp->fd != NULL) exit(6); //code erreur a determiner
+                    tmp->fd = new;
+                    //printf("fils va a droite\n");
+                }else{
+                    if(tmp->fg != NULL) exit(6); //code erreur a determiner
+                    tmp->fg = new;
+                    //printf("fils va a gauche\n");
+                }
+                new -> elmt = elm;
+                new->equilibre = 0;
+                new->fg = NULL ;
+                new->fd = NULL ;
+                return a;
+            }
+        }
+        return a;
+    }
     if(mod == 5){
         pA tmp = rechercheParentCreation(a, elm->station);
         pA new = malloc(sizeof(Arbre));
@@ -343,9 +377,9 @@ void ecriture (FILE * fichier, Elmt * elmt, int mod, int * num, int file){// arb
         if (mod == 1)fprintf(fichier, "%li;%f;%f;%f;\n", *num, elmt->somme / elmt->nbelmt, elmt->min, elmt->max);
         if (mod == 2)fprintf(fichier, "%li;%f;\n", *num, elmt->somme / elmt->nbelmt);
         if (mod == 3);
-        if (mod == 4);
+        if (mod == 4)fprintf(fichier, "%d;%f;%f;%f;%f\n", elmt->station, elmt->max, elmt->min, elmt->somme / elmt->nbelmt,elmt->somme2 / elmt->nbelmt2);
         if (mod == 5)fprintf(fichier, "%f;%f;%f;\n", elmt->max, elmt->somme, elmt->min);
-        if (mod == 6);
+        if (mod == 6);// ne servira pas
         if (mod == 7)fprintf(fichier, "%f;%f;%f;\n", elmt->max, elmt->somme, elmt->min);
         //printf("?\n");
         *num = *num + 1;
@@ -355,9 +389,9 @@ void ecriture (FILE * fichier, Elmt * elmt, int mod, int * num, int file){// arb
         if (mod == 1)fprintf(fichier, "%li;%f;%f;%f\n", elmt->station, elmt->somme / elmt->nbelmt, elmt->min, elmt->max);
         if (mod == 2)fprintf(fichier, "%li;%f\n", elmt->station, elmt->somme / elmt->nbelmt);
         if (mod == 3);
-        if (mod == 4);
+        if (mod == 4)fprintf(fichier, "%d;%f;%f;%f;%f\n", elmt->station, elmt->max, elmt->min, elmt->somme / elmt->nbelmt,elmt->somme2 / elmt->nbelmt2);
         if (mod == 5)fprintf(fichier, "%f;%f;%f\n", elmt->max, elmt->somme, elmt->min);
-        if (mod == 6);
+        if (mod == 6);//ne servira pas
         if (mod == 7)fprintf(fichier, "%f;%f;%f;\n", elmt->max, elmt->somme, elmt->min);
     }
 }
@@ -420,7 +454,7 @@ void traitementArbre(char *  nomdufichier, int info, int mod){
                             tmp->max = tmp->somme;
                             //printf("avant creation arbre \n");
                             arbre = creationArbre(arbre, tmp, info, mod);
-                              //printf("ok jusqu'ici \n");
+                            //printf("ok jusqu'ici \n");
                         }
                     }
                 }
@@ -536,7 +570,87 @@ void traitementArbre(char *  nomdufichier, int info, int mod){
 
     }
     if(mod == 4){ //boucle pour le tri 4
-        
+    //station;longitude;lattitude;direction;intensite
+        { //boucle de creation de l'arbre
+            elmt1 = malloc(sizeof(Elmt));
+            //printf("boucle\n");
+            fscanf(fichierEntree, "%d", &elmt1->station);
+            if(! feof(fichierEntree)){
+                a = fgetc(fichierEntree);//passe le separateur
+                if(a != '\n' && a != ' '){ 
+                    a = fgetc(fichierEntree); 
+                    if (a != '\n' && a != ' '){
+                        fseek(fichierEntree,SEEK_CUR,-1);
+                        fscanf(fichierEntree, "%f", &elmt1->max); //longitude
+                        a = fgetc(fichierEntree);//passe le separateur
+                        if(a != '\n' && a != ' '){ 
+                            a = fgetc(fichierEntree); 
+                            if (a != '\n' && a != ' '){
+                                fseek(fichierEntree,SEEK_CUR,-1);
+                                fscanf(fichierEntree, "%f", &elmt1->min);//latitude
+                                if (a != '\n' && a != ' '){
+                                    fseek(fichierEntree,SEEK_CUR,-1);
+                                    fscanf(fichierEntree, "%f", &elmt1->somme);//direction vent
+                                    a = fgetc(fichierEntree);//passe le separateur
+                                    if(a != '\n' && a != ' '){ 
+                                        a = fgetc(fichierEntree); 
+                                        if (a != '\n' && a != ' '){
+                                            fseek(fichierEntree,SEEK_CUR,-1);
+                                            fscanf(fichierEntree, "%f", &elmt1->somme2);//intensite vent
+                                            elmt1->nbelmt = 1;
+                                            elmt1->nbelmt2 = 1;
+                                            arbre->elmt = elmt1;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        //boucle generale
+        while (! feof(fichierEntree)){ //boucle de creation de l'arbre
+            tmp = malloc(sizeof(Elmt));
+            //printf("boucle\n");
+            fscanf(fichierEntree, "%d", &tmp->station);
+            if(! feof(fichierEntree)){
+                a = fgetc(fichierEntree);//passe le separateur
+                if(a != '\n' && a != ' '){ 
+                    a = fgetc(fichierEntree); 
+                    if (a != '\n' && a != ' '){
+                        fseek(fichierEntree,SEEK_CUR,-1);
+                        fscanf(fichierEntree, "%f", &tmp->max); //longitude
+                        a = fgetc(fichierEntree);//passe le separateur
+                        if(a != '\n' && a != ' '){ 
+                            a = fgetc(fichierEntree); 
+                            if (a != '\n' && a != ' '){
+                                fseek(fichierEntree,SEEK_CUR,-1);
+                                fscanf(fichierEntree, "%f", &tmp->min);//latitude
+                                if (a != '\n' && a != ' '){
+                                    fseek(fichierEntree,SEEK_CUR,-1);
+                                    fscanf(fichierEntree, "%f", &tmp->somme);//direction vent
+                                    printf("%d\n", tmp->somme);
+                                    a = fgetc(fichierEntree);//passe le separateur
+                                    if(a != '\n' && a != ' '){ 
+                                        a = fgetc(fichierEntree); 
+                                        if (a != '\n' && a != ' '){
+                                            fseek(fichierEntree,SEEK_CUR,-1);
+                                            fscanf(fichierEntree, "%f", &tmp->somme2);//intensite vent
+                                            tmp->nbelmt = 1;
+                                            tmp->nbelmt2 = 1;
+                                            //printf("avant arbre\n");
+                                            if(tmp !=NULL)arbre = creationArbre(arbre, tmp, info, mod);
+                                            //printf("apres arbre\n");
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
     if(mod == 5){ //boucle pour le tri 5
         //tri selon station, humidité, longitude et lattitude
