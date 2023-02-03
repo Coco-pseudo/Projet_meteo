@@ -10,13 +10,21 @@ Projet d'Informatique 3 : CyMeteo
 
 Le contenu est le suivant : 
 	-Deux executable shell : Projet.sh et Traitement.sh
+	
 	-Les fichier c : projet.c et tableau.c
+	
 	-Un fichier h : projet.h
+	
 	-Un dossier "gnuplot" contenant les fichiers gnu : Barre.gnu, Ligne.gnu, MultiLigne.gnu, CarteInter.gnu, vecteur.gnu
+	
 	-Le fichier txt : help.txt
+	
 	-Le fichier csv : meteo_filtered_data_v1.csv 
+	
 	-Ce fichier : README.txt
+	
 	-Le Fichier csv : Id.csv
+	
 
 
 Les noms de ces fichiers devront être respéctés au caractère près afin de faire fonctionner correctement le script.
