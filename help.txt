@@ -11,8 +11,9 @@ Nom de l'executable : Projet.sh
 
 Ressources utilisés: 
 
-		-Projet.c 
-		-Projet.h
+		-projet.c 
+		-tableau.c
+		-projet.h
 		-Traitement.sh
 		-gnuplot/Barre.gnu
 		-gnuplot/Ligne.gnu
