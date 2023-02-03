@@ -48,7 +48,7 @@ Les options disponibles :
 		Il n'est pas possible de choisir plusieurs mode en même temps
 		(./Projet.sh -f doc.csv -t1 -t2 ne seras pas accepté)
 			
-	-h , pour choisir un tri par altitude (NON DISPONIBLE)
+	-h , pour choisir un tri par altitude 
 
 	-w , pour choisir un tri en fonction du vent (NON DISPONIBLE)
 	
@@ -76,7 +76,7 @@ Les options disponibles :
 	
 	
 
-	--tab , pour choisir un tri en utilisant les tableaux/listes chainées (NON DISPONIBLE)
+	--tab , pour choisir un tri en utilisant les tableaux/listes chainées (Disponible uniquement pour t1 et p1)
 
 	--abr , pour choisir un tri en utilisant les Arbres Binaires de recherches
 
