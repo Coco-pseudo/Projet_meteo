@@ -399,7 +399,7 @@ void traitementArbre(char *  nomdufichier, int info, int mod){
     FILE* fichierEntree = fopen(nomdufichier, "r");
     FILE* fichierSortie1 = ouvertureFichierSortie(nomdufichier,1);
     FILE* fichierSortie2 = fichierSortie2 = ouvertureFichierSortie(nomdufichier,2);
-    printf("ok pour l'ouverture des fichiers \n");
+    //printf("ok pour l'ouverture des fichiers \n");
     //info sera 1 pour tout
     int tmp2;
     pA arbre = malloc(sizeof(Arbre));
@@ -628,7 +628,7 @@ void traitementArbre(char *  nomdufichier, int info, int mod){
                                     a=fgetc(fichierEntree);
                                     fseek(fichierEntree,SEEK_CUR,-1);
                                     fscanf(fichierEntree, "%f", &tmp->somme);//direction vent
-                                    printf("%f\n", tmp->somme);
+                                    //printf("%f\n", tmp->somme);
                                     a = fgetc(fichierEntree);//passe le separateur
                                     if(a != '\n' && a != ' '){ 
                                         a = fgetc(fichierEntree); 
@@ -773,7 +773,7 @@ void traitementArbre(char *  nomdufichier, int info, int mod){
     }
     //printf("ok pour la creation de l'arbre \n");
     fclose(fichierEntree);
-    printf("arbre ok\n");
+    //printf("arbre ok\n");
     //printf("%d est la racine de l'arbre \n" , arbre->elmt->station);
     //parcoursInfixe(arbre);
     int* num = NULL;
@@ -839,7 +839,7 @@ int main (int argc, char *argv[]) {// a indique le mode souhaité entre AVL, ABR
             exit(1);
             break;
     }
-    printf("done c \n");
+    printf("fin du c \n");
     return 0;
 
 }//*/
