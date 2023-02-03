@@ -109,7 +109,7 @@ pas possible de choisir plusieurs options parmis les suivantes:
 
 
 
-
+Le menu d'aide
 
 		
 
@@ -128,7 +128,7 @@ Le script pourra retourner un code erreur en fonction de la situation:
 		1 : Erreur liée à un fichier vide (Entrée ou Sortie)		
 		
 		
-		2 : Erreur liée a un problème d'option (option/argument inconnu, insufisant ou trop)
+		2 : Erreur liée a un problème d'option (option/argument inconnu, insufisant ou trop d'option/ d'arguments)
 		
 		
 		3 : Erreur liée aux fichiers present dans le répertoire(Absent, mal nommé)
