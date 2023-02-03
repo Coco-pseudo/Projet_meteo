@@ -7,7 +7,7 @@
 
 
 
-Nom de l'executable : Projet.sh
+Nom de l'executable : projet.sh
 
 Ressources utilisés: 
 
