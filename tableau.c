@@ -1,4 +1,4 @@
-#include "projet.h"
+#include "projetV2.h"
 
 //pour l'instant, on considere que on fait d'abord appel au traitement avl
 //pour avoir le nombre de lignes finale
@@ -23,17 +23,17 @@ int minint(int a, int b){
 int rechercheDichotomique(Elmt * Tableau[70], Elmt * elmt, int mod, int * maximum){
     int minimum = 0;
     int recherchemax = *maximum;
-    printf("recherche : %d\n",recherchemax);
+    //printf("recherche : %d\n",recherchemax);
     //printf("recherche : %d, %d\n",recherchemax, *maximum);
-    printf("milieu depart : %d\n", (recherchemax + minimum)/2);
-    printf("elmt->station = %d\n",elmt->station);
+    //printf("milieu depart : %d\n", (recherchemax + minimum)/2);
+    //printf("elmt->station = %d\n",elmt->station);
     if(mod!=7){
         //verif extremums
         if (Tableau[minimum]->station > elmt->station)return minimum;
         if (Tableau[recherchemax]->station < elmt->station)return recherchemax;
         //boucle generale
         while((Tableau[((recherchemax + minimum)/2) ]->station!=elmt->station) && recherchemax != minimum && recherchemax != minimum +1){
-            printf("milieu actuel : %d\n", (recherchemax + minimum)/2);
+            //printf("milieu actuel : %d\n", (recherchemax + minimum)/2);
             if (Tableau[minimum]->station > elmt->station)return minimum;
             if(Tableau[recherchemax]->station < elmt->station)return recherchemax;
             if(Tableau[((recherchemax + minimum)/2)]->station > elmt->station){
@@ -104,7 +104,7 @@ int rechercheDichotomique(Elmt * Tableau[70], Elmt * elmt, int mod, int * maximu
     }*/
 }
 Elmt ** decalageTableau(int debut, Elmt * Tableau[70]){
-    printf("debut decalage\n");
+    //printf("debut decalage\n");
     Elmt * tmp = malloc(sizeof(Elmt));
     tmp = Tableau[debut];
     Tableau[debut]=NULL;
@@ -190,7 +190,7 @@ Elmt * scanElmt(FILE * fichier, int mod){
                     if (a != '\n' && a != ' '){
                         fseek(fichier,SEEK_CUR,-1);
                         fscanf(fichier, "%f", &elmt->somme);
-                        printf("%d, %f \n", elmt->station, elmt->somme);
+                        //printf("%d, %f \n", elmt->station, elmt->somme);
                         elmt->nbelmt = 1;
                         elmt->min = elmt->somme;
                         elmt->max = elmt->somme;
@@ -224,8 +224,8 @@ Elmt * scanElmt(FILE * fichier, int mod){
                     if(a != '\n' && a != EOF && a != ' '){
                         fseek(fichier,SEEK_CUR,-1);
                         fscanf(fichier, "%f", &elmt->somme);//prend lattitude
-                        printf("humidite : %f \n", elmt->min);
-                        printf("%f,%f\n",elmt->max, elmt->somme);
+                        //printf("humidite : %f \n", elmt->min);
+                        //printf("%f,%f\n",elmt->max, elmt->somme);
                         if(elmt->min != 0)return elmt;
                     }
                 }
@@ -259,14 +259,14 @@ void parcoursDecroissantTableauEcriture(FILE* fichier, Elmt * Tableau [70],int m
 }
 Elmt ** traitementTableau(FILE* fichier, Elmt * Tableau[70] ,int mod){
     //Elmt * Tableau[70];
-    printf("debutTraitementTableau\n");
+    //printf("debutTraitementTableau\n");
     int valeur = 0;
     int * maximum = &valeur;
     Elmt * elmt1 = malloc(sizeof(Elmt)); 
     Elmt * tmp = malloc(sizeof(Elmt));
     elmt1 = scanElmt(fichier, mod);
     Tableau[0] = elmt1;
-    printf("%d\n \n",Tableau[0]->station);
+    //printf("%d\n \n",Tableau[0]->station);
     while(!feof(fichier)){
         Elmt * tmp = malloc(sizeof(Elmt));
         tmp = scanElmt(fichier, mod);
@@ -279,10 +279,10 @@ void appelTraitementTableau(char* nomdufichier, int mod){
     FILE * fichierEntree = fopen(nomdufichier, "r");
     FILE* fichierSortie1 = ouvertureFichierSortie(nomdufichier,1);
     FILE* fichierSortie2 = fichierSortie2 = ouvertureFichierSortie(nomdufichier,2);
-    printf("ok pour l'ouverture des fichiers \n");
+    //printf("ok pour l'ouverture des fichiers \n");
     Elmt ** Tableau = creationTableau();
     Tableau = traitementTableau(fichierEntree, Tableau, mod);
-    printf("tableau complet\n");
+    //printf("tableau complet\n");
     if(mod<5){
         parcoursCroissantTableauEcriture(fichierSortie1, Tableau, mod, 1);
         parcoursCroissantTableauEcriture(fichierSortie2, Tableau, mod, 2);

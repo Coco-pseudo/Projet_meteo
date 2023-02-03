@@ -1,4 +1,74 @@
 #!/bin/bash
+L=0
+t=0
+p=0
+w=0
+h=0
+m=0
+
+FC="projetV2.c"
+FH="projetV2.h"
+Ftab="tableau.c"
+
+
+#-----------------------------------------------------------------------------------------------------------------
+#-----------------Verif tous les fichiers sont présent avant de commencer-----------------------------------------
+#-----------------------------------------------------------------------------------------------------------------
+#-----------------------------------------------------------------------------------------------------------------
+
+if [ !  -f $FC ] #verif c present
+then
+    echo "Absence du fichier C ($FC)"
+    exit 3
+fi
+
+if [ !  -f $Ftab ] #verif c present
+then
+    echo "Absence du fichier C ($Ftab)"
+    exit 3
+fi
+
+ 
+
+if [ ! -f $FH  ] #verif h present
+then
+    echo "Absence du fichier .h pour ($FH)"
+    exit 3
+fi
+
+if [ ! -f help.txt ]
+then 
+    echo "Absence du fichier  d'aide (help.txt)"
+    exit 3
+fi
+
+if [ ! -f meteo_filtered_data_v1.csv ]
+then 
+    echo "Absence du fichier de données de référence (meteo_filtered_data_v1.csv)"
+    exit 3
+fi
+
+if [ ! -d gnuplot ]
+then
+    echo "Absence du répertoire contenant les fichier gnu (gnuplot)"
+    exit 3
+fi
+
+if [ ! -f gnuplot/Barre.gnu ] || [ ! -f gnuplot/Ligne.gnu ] || [ ! -f gnuplot/MultiLigne.gnu ] || [ ! -f gnuplot/CarteInter.gnu ] || [ ! -f gnuplot/vecteur.gnu ]
+then 
+    echo "Absence d'un(ou plusieurs) fichier(s) gnu (Barre.gnu, Ligne.gnu, MultiLigne.gnu, CarteInter.gnu, vecteur.gnu)"
+    exit 3
+fi
+
+
+
+
+
+#-----------------------------------------------------------------------------------------------------------------
+#-----------------Traitement Options------------------------------------------------------------------------------
+#-----------------------------------------------------------------------------------------------------------------
+#-----------------------------------------------------------------------------------------------------------------
+
 
 while getopts ":t:p:whmFGSAOQd:-:f:" opt
 
@@ -7,70 +77,161 @@ do
         t) 
         i=$OPTARG 
         case $i in 
-            1)  #min/max/moy   #il faut garder les colonnes 1 et 11 (num balise + temp)
+            1)  
+            if [ $t -ne 0 ]
+            then
+                echo "Un seul mode de tri par température a la fois est autorisé"
+                exit 2
+            fi
             t=1     
             ;;
-            2) 
+            2)
+            echo "Option -$opt$j: prochainement"
+            exit 4 
+            if [ $t -ne 0 ]
+            then
+                echo "Un seul mode de tri par température a la fois est autorisé"
+                exit 2
+            fi
             t=2
             ;;
-            3) 
+            3)
+            echo "Option -$opt$j: prochainement"
+            exit 4
+            if [ $t -ne 0 ]
+            then
+                echo "Un seul mode de tri par température a la fois est autorisé"
+                exit 2
+            fi 
             t=3
             ;;
-            12) echo "coucou"
-            ;;
+
             *) echo "Mode inconnu/manquant "
-            exit 1
+            exit 2
             ;;  
         esac
 
 
         ;; 
         p) 
-        p=1
         j=$OPTARG 
         case $j in 
-            1) 
+            1)
+            if [ $p -ne 0 ]
+            then
+                echo "Un seul mode de tri par pression a la fois est autorisé"
+                exit 2
+            fi 
             p=1
             ;;
             2) 
+            echo "Option -$opt$j: prochainement"
+            exit 4
+            if [ $p -ne 0 ]
+            then
+                echo "Un seul mode de tri par pression a la fois est autorisé"
+                exit 2
+            fi 
             p=2
             ;;
-            3) 
+            3)
+            echo "Option -$opt$j: prochainement"
+            exit 4
+            if [ $p -ne 0 ]
+            then
+                echo "Un seul mode de tri par pression a la fois est autorisé"
+                exit 2
+            fi 
             p=3
             ;;
             *) echo "Mode inconnu/manquant" 
-            exit 1   
+            exit 2   
         esac
 
         ;;
-        w) 
+        
+        w)
+        echo "Option -$opt: prochainement"
+        exit 4 
         w=1
         ;;
+        
         h)
+        #echo "Option -$opt: prochainement"
+        #exit 4
         h=1
         ;;
+        
         m) 
+        #echo "Option -$opt: prochainement"
+        #exit 4
         m=1
         ;;
-        F) echo "Option localisation 1"
+        
+        F) #echo "Option localisation 1"
+        if [ $L -ne 0 ]
+        then
+            echo "Une seule Option de localisation à la fois est autorisé (parmis -F -G -S -A -O -Q)"
+            exit 2
+        fi
+        L=1
+        ;;
+        
+        G) #echo "Option localisation 2"
+        if [ $L -ne 0 ]
+        then
+            echo "Une seule Option de localisation à la fois est autorisé (parmis -F -G -S -A -O -Q)"
+            exit 2
+        fi
+        L=2
 
         ;;
-        G) echo "Option localisation 2"
-
+        
+        S) #echo "Option localisation 3"
+        if [ $L -ne 0 ]
+        then
+            echo "Une seule Option de localisation à la fois est autorisé (parmis -F -G -S -A -O -Q)"
+            exit 2
+        fi
+        L=3
         ;;
-        S) echo "Option localisation 3"
-
+        
+        A) #echo "Option localisation 4"
+        echo "Option -$opt: prochainement"
+        exit 4
+        if [ $L -ne 0 ]
+        then
+            echo "Une seule Option de localisation à la fois est autorisé (parmis -F -G -S -A -O -Q)"
+            exit 2
+        fi        
+        L=4
         ;;
-        A) echo "Option localisation 4"
 
+        O) #echo "Option localisation 5"
+        echo "Option -$opt: prochainement"
+        exit 4
+        if [ $L -ne 0 ]
+        then
+            echo "Une seule Option de localisation à la fois est autorisé (parmis -F -G -S -A -O -Q)"
+            exit 2
+        fi
+        L=5
         ;;
-        O) echo "Option localisation 5"
 
+        Q) #echo "Option localisation 6"
+        echo "Option -$opt: prochainement"
+        exit 4
+        if [ $L -ne 0 ]
+        then
+            echo "Une seule Option de localisation à la fois est autorisé (parmis -F -G -S -A -O -Q)"
+            exit 2
+        fi
+        L=6
         ;;
-        Q) echo "Option localisation 6"
-
-        ;;
+        
         d) 
+        echo "Option -$opt: prochainement"
+        exit 4
         i=$OPTARG
         echo $i
         #grep -q [2][0][0-2][0-9].[0-1][0-9].[0-3][0-9] - [2][0][0-2][0-9].[0-1][0-9].[0-3][0-9] $i
@@ -78,20 +239,22 @@ do
         ;;
         -)
         case ${OPTARG} in
-            tab) echo "Option Tab"
-            T=1
+            tab) #echo "Option Tab"
+            #echo "Option -$opt$OPTARG: prochainement"
+            #exit 4
+            T=3
             ;;
-            abr) echo "Option abr"
+            abr) #echo "Option abr"
             T=2
             ;;
-            avl) echo "Option avl"
+            avl) #echo "Option avl"
             T=1
             ;;
-            help)  cat help.txt | more
+            help)  cat help.txt | less
             exit 0
             ;;
             *) echo "--$OPTARG: option inconnue"
-            exit 1
+            exit 2
         esac
 
         ;;
@@ -102,29 +265,28 @@ do
         if  [ ! -f $I ]
         then
             echo "Veuillez présicer un nom de fichier valide"
-            exit 1
+            exit 2
         fi      
 
         ;;
-        help) echo "Option help"
 
-        ;;
         :) echo "L'option -$OPTARG nécessite un argument (mode/nom de fichier)"
-        exit 1
+        exit 2
         ;;
         
         \?) echo "-$OPTARG : option inconnue"
-        exit 1
+        exit 2
 
         ;;
     esac
 
 done
 
-#verif presence option fichier 
-#OK
+#-----------------------------------------------------------------------------------------------------------------
+#-----------------Verif options sont présent et correct avant de commencer----------------------------------------
+#-----------------------------------------------------------------------------------------------------------------
+#-----------------------------------------------------------------------------------------------------------------
 
-#verif date si mode 2/3
 
  
 
@@ -135,23 +297,26 @@ then
     exit 2
 fi
 
+if [ $I = "meteo_filtered_data_v1.csv" ]
+then
+    echo "fichier original"
+else
+
+    echo "Il ne s'agit pas du bon fichier ($I atttendu:meteo_filtered_data_v1.csv)" 
+fi
+
+if [ ! -s $I ]
+then 
+    echo "Le fichier $I vide" 
+    exit 1
+fi
 
 
 
-
-
-#verif presence fichier dans dossier 
-#OK
-
-#traiter les options composées de chaines de caractères --> considérer "-" comme une option et regarder les arguments ensuite via un autre case{...}
-#OK
-
-#verif un seul choix parmis AVL,ABR,tab     --> si pas de choix, AVL par défaut
-#ok
 if   [ -z "$a" ] && [ -z "$A" ]  && [ -z "$T" ]
 then
     #tri par defaut : AVL
-    T=3
+    T=1
 fi
 
 
@@ -170,170 +335,47 @@ then
     echo "Un seul mode de tri autorisé (parmis AVL,ABR,Tab)"
     exit 2
 fi
-#verif deux argument pour option date, avec min, max
 
-#verif au moins un parmis t,p,w,h ==> ok
 
+ 
 if   [ -z "$t" ] && [ -z "$p" ]  && [ -z "$w" ] && [ -z "$m" ] && [ -z "$h" ]
 then
    echo "Choisissez au moins une grandeur pour trier les données ( parmis température, pression, vent, humidité, altitude)"
    exit 2
 fi
 
-
-if [ ! -z  "$t1" ] #cas où on est en temperature mode 1
-then
-    echo "température mode 1 "
-
-fi
-
-#tri du doc (garder que infos utiles) in progress
-#option date/localisation
-#executer programme c
-#affichage gnuplot
-#commande HELP
-
-
-#-------------partie "epuration" du fichier--------------
-case $t in 
-    1)cut -d";" -f1,11 $I > Tmp.csv
-    M=1
-    ;;
-    2)cut -d";" -f2,11 $I > Tmp.csv
-    M=2
-    ;;
-    3)cut -d";" -f1,2,11 $I > Tmp.csv
-    M=3
-    ;;
-    \?)
-    exit 1
-esac
-
-case $p in 
-    1)cut -d";" -f1,7 $I > Tmp.csv
-    M=1
-    ;;
-    2)cut -d";" -f2,7 $I > Tmp.csv
-    M=2
-    ;;
-    3)cut -d";" -f1,2,7 $I > Tmp.csv
-    M=3
-    ;;
-    \?)
-    exit 1
-esac
-
-
-if [ ! -z "$w" ] 
-then
-    if [ $w -eq 1 ] 
+if [ ! -x Traitement.sh ] #donner permission d'executer si pas déjà
     then
-        M=4
-        cut -d";" -f1,4,5  $I > Tmp.csv
+    chmod +x Traitement.sh
     fi
-fi
 
-if [ ! -z "$m" ] # mettre longitude, lattitude et pas Id station
+if [ $t -ne 0 ]
 then
-    if [ $m -eq 1 ] 
-    then
-        cut -d";" -f10,6  $I > Tmp2.csv
-        sed 's/,/;/g' "Tmp2.csv" >Tmp.csv
-        rm Tmp2.csv 
-        M=5
-    fi
+    ./Traitement.sh -f$I -t$t -T$T -L$L
 fi
 
-if [ ! -z "$h" ] # mettre longitude, lattitude et pas Id station
+if [ $p -ne 0 ]
 then
-    if [ $h -eq 1 ] 
-    then
-        cut -d";" -f14,10 $I > Tmp2.csv
-        sed 's/,/;/g' "Tmp2.csv" >Tmp3.csv
-        awk -F\; '{print $3";"$1";"$2}' Tmp3.csv >Tmp.csv
-        rm Tmp2.csv
-        rm Tmp3.csv
-    fi
+    ./Traitement.sh -f$I -p$p -T$T -L$L
 fi
- 
 
+if [ $w -ne 0 ]
+then
+    ./Traitement.sh -f$I -w -T$T -L$L
+fi
 
-#retirer la premiere ligne (avec les chaines de caractères)
-sed '1d' Tmp.csv > tmp.csv
-rm Tmp.csv
+if [ $h -ne 0 ]
+then
+    ./Traitement.sh -f$I -h -T$T -L$L
+fi
 
-
-
-
-#-------------------utilisation du c-----------------
-gcc Projet.c -o Exec 
-./Exec 1 tmp.csv
-
-sed 's/\./,/g' "ValeursRetours.csv" > ValeursRetours2.csv
-rm ValeursRetours.csv
-mv ValeursRetours2.csv ValeursRetours.csv
-
+if [ $m -ne 0 ]
+then
+    ./Traitement.sh -f$I -m -T$T -L$L
+fi
 
 
 
-
-
-
-#------------------partie affichage gnuplot-----------------------
-
-
-
-case $M in 
-
-    1)
-    cp ValeursRetours.csv testgnuplot/
-    cd testgnuplot
-    gnuplot Barre.gnu --persist
-    cd ..
-    ;;
-
-
-    2)
-    cd testgnuplot
-    gnuplot Ligne.gnu --persist
-    cd ..
-
-    ;;
-
-
-
-
-    3)
-    cd testgnuplot
-    gnuplot MultiLigne.gnu --persist
-    cd ..
-    ;;
-
-
-
-
-    4)
-    cd testgnuplot 
-    gnuplot vecteur.gnu --persist
-    cd ..
-    ;;
-
-
-
-    5)cd testgnuplot 
-    gnuplot CarteInter.gnu --persist
-    cd ..
-    ;;
-
-
-
-    \?)
-    exit 1
-
-
-esac
-
-
-echo "done"
+#echo "Fin normale"
 exit 0
 

@@ -1,0 +1,132 @@
+------------------------------------------------------------------------------------
+--------------------------Projet-Informatique-3-------------------------------------
+--------------------------------CY-Meteo--------------------------------------------
+------------------------------Menu-Help/Aide----------------------------------------
+----------------------GUEDES-CORENTIN--GAGNEUX-QUENTIN------------------------------
+------------------------------------------------------------------------------------
+
+
+
+Nom de l'executable : Projet.sh
+
+Ressources utilisés: 
+
+		-Projet.c 
+		-Projet.h
+		-Traitement.sh
+		-gnuplot/Barre.gnu
+		-gnuplot/Ligne.gnu
+		-gnuplot/MultiLigne.gnu
+		-gnuplot/CarteInter.gnu
+		-gnuplot/vecteur.gnu
+		
+		
+
+Les options disponibles :
+	-f suivi du nom du fichier au format csv, pour choisir un fichier 
+
+	Cette option est obligatoire et devra prendre comme argument le nom du fichier
+	 présent dans le répertoire.
+	
+	
+	-t suivi du numéro de mode(1*/2**/3***), pour choisir un tri par température
+
+	-p suivi du numéro de mode(1*/2**/3***), pour choisir un tri par pression
+	
+		Au moins une de ces mode d'options devra être choisi:
+		1 : tri en fonction des températures (ou pressions) minimales, 
+		maximales et moyennes par station dans l’ordre
+		croissant du numéro de station.
+		2 : tri en fonction des températures (ou pressions) moyennes par 
+		date/heure, triées dans l’ordre chronologique.
+		La moyenne se fait sur toutes les stations. (NON DISPONIBLE)
+		3 : tri en fonction des températures (ou pressions) par date/heure 
+		par station. Elles seront triées d’abord par ordre chronologique, 
+		puis par ordre croissant de l’identifiant de la station. (NON DISPONIBLE)
+		
+		Il n'est pas possible de choisir plusieurs mode en même temps
+		(./Projet.sh -f doc.csv -t1 -t2 ne seras pas accepté)
+			
+	-h , pour choisir un tri par altitude (NON DISPONIBLE)
+
+	-w , pour choisir un tri en fonction du vent (NON DISPONIBLE)
+	
+	-m , pour choisir un tri en fonction de l'humidité maximale pour chaque station (NON DISPONIBLE)
+	
+				
+		Il est possible de choisir plusieurs mode s'ils ne concerne pas la même 
+		données (température, pression, vent, altitude, humidité)
+				
+			Seront acceptés, des commmandes du type: 
+				
+				./Projet.sh -f doc.csv -t1 -p3 -w -h 
+
+
+
+	-d suivi de la date de debut et de la date de fin, au format JJ.MM.AAAA-JJ.MM.AAAA,
+	 pour définir la tranche horaire à étudier (NON DISPONIBLE)
+	
+	-F , pour restreindre les données au stations situées en France métropolitaine 
+	et en Corse
+
+	-G , pour restreindre les données au stations situées en Guyanne Francaise
+	
+	
+	
+	
+
+	--tab , pour choisir un tri en utilisant les tableaux/listes chainées (NON DISPONIBLE)
+
+	--abr , pour choisir un tri en utilisant les Arbres Binaires de recherches
+
+	--avl , pour choisir un tri en utilisant les Arbres Binaires de recherches 
+	equilibré (AVL)
+
+		Un seul de ces trois mode de tri pourra être choisi. Par défaut on 
+		utilisera les AVL.
+		
+
+
+	--help , pour afficher le menu d'aide
+	
+	
+Exemples 
+		./Projet.sh -f doc.csv -t1 
+		
+				sortie : Température maximale, minimale et moyenne 
+				par station depuis le ficher "doc.csv"
+				
+		
+		./Projet.sh -f Data.csv -p1 -w --tab -F
+				sortie : Pression maximale, minimale et moyenne par 
+				station localisée en France Métropolitaine et en Corse
+				 depuis le ficher "Data.csv"
+			
+	
+	
+Le script pourra retourner un code erreur en fonction de la situation:
+
+		
+		
+		0 : Aucun problème le script s'est exécuté jusqu'à la fin sans erreur 
+		
+		
+		1 : Erreur liée à un fichier vide (Entrée ou Sortie)
+		
+		
+		
+		2 : Erreur liée a un problème d'option (option/argument inconnu, 
+		insufisant ou trop d'option)
+		
+		
+		3 : Erreur liée aux fichiers present dans le répertoire(Absent, mal nommé)
+		
+		
+		4 : L'option n'est pas encore disponible	
+
+
+
+
+
+
+appuyez sur q pour quitter
