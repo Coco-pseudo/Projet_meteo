@@ -3,7 +3,7 @@
 
 
 
-
+set datafile separator ";"
 set xlabel 'longitude'
 set ylabel 'latitude' 
 set view map
