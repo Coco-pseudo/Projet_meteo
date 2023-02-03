@@ -11,7 +11,7 @@ typedef struct element{
     int nbelmt;
     float somme2;
     int nbelmt2;
-    long station; //peut contenir la date comme chaine de caractere
+    int station; //peut contenir la date comme chaine de caractere
 }Elmt;
 typedef struct arbre {
     struct arbre * fd;

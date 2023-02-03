@@ -35,8 +35,8 @@ int descendance(pA a){
 }
 pA rechercheParentCreation(pA a, long id){ //dans le cas ou un element est egal a celui que l'on cree, on renvoie sa localisation, sinon c le futur parent.
     //if(estVide(a))printf("fuck you\n");
-    //printf("%li, %d\n", a->elmt->station, id);
-    //printf(" %li \n", a->elmt->station);
+    //printf("%d, %d\n", a->elmt->station, id);
+    //printf(" %d \n", a->elmt->station);
     if(!estVide(a)){
         if(a->elmt != NULL){ //cas du premier element ajouté a l'arbre (ne devrait pas etre rencontré)
             if(id < a->elmt->station){
@@ -188,7 +188,7 @@ Pile * rechercheParentModifEquilibre(long id, Pile* pile){ //dans le cas ou un e
 }
 pA creationArbre(pA a, Elmt* elm, int info, int mod){ //si la station existe dans l'arbre
     if(mod == 1){
-        //printf("%li \n",elm->station);
+        //printf("%d \n",elm->station);
         //printf("%f \n", elm->somme);
         pA tmp =rechercheParentCreation(a, elm->station);
         //printf("%d ", tmp->elmt->station);
@@ -367,15 +367,15 @@ void parcoursInfixeEcriture(FILE* fichier,pA arbre, int mod, int* num, int file)
 }
 void ecriture (FILE * fichier, Elmt * elmt, int mod, int * num, int file){// arbre en entrée, ecrit dans le fichier les elements de pa dans l'ordre
     // *num est l'indice factice de la station
-    //printf("%li \n", ftell(fichier));
+    //printf("%d \n", ftell(fichier));
     //mod 5 sortie : longitude; latitude ; humidité
     if (file == 2){ //Valeurretours
         //identique a l'autre fichier pour 5 et 6
         //printf("test\n");
         //printf("%f;%f;%f;\n", elmt->somme, elmt->min, elmt->max);
         
-        if (mod == 1)fprintf(fichier, "%li;%f;%f;%f;\n", *num, elmt->somme / elmt->nbelmt, elmt->min, elmt->max);
-        if (mod == 2)fprintf(fichier, "%li;%f;\n", *num, elmt->somme / elmt->nbelmt);
+        if (mod == 1)fprintf(fichier, "%d;%f;%f;%f;\n", *num, elmt->somme / elmt->nbelmt, elmt->min, elmt->max);
+        if (mod == 2)fprintf(fichier, "%d;%f;\n", *num, elmt->somme / elmt->nbelmt);
         if (mod == 3);
         if (mod == 4)fprintf(fichier, "%d;%f;%f;%f;%f\n", elmt->station, elmt->max, elmt->min, elmt->somme / elmt->nbelmt,elmt->somme2 / elmt->nbelmt2);
         if (mod == 5)fprintf(fichier, "%f;%f;%f;\n", elmt->max, elmt->somme, elmt->min);
@@ -386,8 +386,8 @@ void ecriture (FILE * fichier, Elmt * elmt, int mod, int * num, int file){// arb
     }
     if(file == 1){ //valeuridreelle
         //printf("%f;%f;%f;\n", elmt->somme, elmt->min, elmt->max);
-        if (mod == 1)fprintf(fichier, "%li;%f;%f;%f\n", elmt->station, elmt->somme / elmt->nbelmt, elmt->min, elmt->max);
-        if (mod == 2)fprintf(fichier, "%li;%f\n", elmt->station, elmt->somme / elmt->nbelmt);
+        if (mod == 1)fprintf(fichier, "%d;%f;%f;%f\n", elmt->station, elmt->somme / elmt->nbelmt, elmt->min, elmt->max);
+        if (mod == 2)fprintf(fichier, "%d;%f\n", elmt->station, elmt->somme / elmt->nbelmt);
         if (mod == 3);
         if (mod == 4)fprintf(fichier, "%d;%f;%f;%f;%f\n", elmt->station, elmt->max, elmt->min, elmt->somme / elmt->nbelmt,elmt->somme2 / elmt->nbelmt2);
         if (mod == 5)fprintf(fichier, "%f;%f;%f\n", elmt->max, elmt->somme, elmt->min);
@@ -481,7 +481,7 @@ void traitementArbre(char *  nomdufichier, int info, int mod){
                 if (!(nvldate < '0'|| nvldate > '9')){
                     date = date * 10 + nvldate - 48;
                     //printf("%d \n", nvldate - 48);
-                    //printf("%li \n", date);
+                    //printf("%d \n", date);
                     n++;
                     //printf("iteration %d \n", n);
                 }
@@ -501,7 +501,7 @@ void traitementArbre(char *  nomdufichier, int info, int mod){
             //printf ("signe = %d \n", signe);
             //printf("%d\n", date);
             date = date + (signe * utc);
-            printf("%li \n", date);
+            printf("%d \n", date);
             
             elmt1->station = date;
             //a = fgetc(fichierEntree);//passe le separateur
@@ -526,7 +526,7 @@ void traitementArbre(char *  nomdufichier, int info, int mod){
                 if (!(nvldate < '0'|| nvldate > '9')){
                     date = date * 10 + nvldate -48;
                     n++;
-                    printf("%li \n",date);
+                    printf("%d \n",date);
                     //printf("iteration %d \n", n);
                 }
             }
@@ -544,7 +544,7 @@ void traitementArbre(char *  nomdufichier, int info, int mod){
             }
             printf("utc : %d\n ",utc);
             date = date + signe * utc;
-            printf("date : %li \n", date);
+            printf("date : %d \n", date);
             tmp->station = date;
             //a = fgetc(fichierEntree);
             //if(a != '\n' && a != EOF && a != ' '){
@@ -553,7 +553,7 @@ void traitementArbre(char *  nomdufichier, int info, int mod){
                   fscanf(fichierEntree, "%f", &tmp->somme);
 
                     printf("elmt : %f \n", tmp->somme);
-                  //printf("%li, %f \n", tmp->station, tmp->somme);
+                  //printf("%d, %f \n", tmp->station, tmp->somme);
                   tmp->nbelmt = 1;
                   //printf("avant creation arbre \n");
                   arbre = creationArbre(arbre, tmp, info, mod);
