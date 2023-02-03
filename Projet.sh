@@ -155,8 +155,8 @@ do
         ;;
         
         w)
-        #echo "Option -$opt: prochainement"
-        #exit 4 
+        echo "Option -$opt: prochainement"
+        exit 4 
         w=1
         ;;
         
@@ -167,8 +167,8 @@ do
         ;;
         
         m) 
-        #echo "Option -$opt: prochainement"
-        #exit 4
+        echo "Option -$opt: prochainement"
+        exit 4
         m=1
         ;;
         
