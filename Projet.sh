@@ -6,8 +6,8 @@ w=0
 h=0
 m=0
 
-FC="projetV2.c"
-FH="projetV2.h"
+FC="projet.c"
+FH="projet.h"
 Ftab="tableau.c"
 
 if [  -d Data/ ]
