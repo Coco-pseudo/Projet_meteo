@@ -10,7 +10,7 @@ Projet d'Informatique 3 : CyMeteo
 
 Le contenu est le suivant : 
 	-Deux executable shell : Projet.sh et Traitement.sh
-	-Les fichier c : Projet.c et tableau.c
+	-Les fichier c : projet.c et tableau.c
 	-Un fichier h : projet.h
 	-Un dossier "gnuplot" contenant les fichiers gnu : Barre.gnu, Ligne.gnu, MultiLigne.gnu, CarteInter.gnu, vecteur.gnu
 	-Le fichier txt : help.txt
