@@ -33,7 +33,7 @@ int descendance(pA a){
     }
     return 0;
 }
-pA rechercheParentCreation(pA a, long id){ //dans le cas ou un element est egal a celui que l'on cree, on renvoie sa localisation, sinon c le futur parent.
+pA rechercheParentCreation(pA a, int id){ //dans le cas ou un element est egal a celui que l'on cree, on renvoie sa localisation, sinon c le futur parent.
     //if(estVide(a))printf("fuck you\n");
     //printf("%d, %d\n", a->elmt->station, id);
     //printf(" %d \n", a->elmt->station);
@@ -143,7 +143,7 @@ Pile * creationPile(pA a){
     nouveau -> suivant = NULL;
     return nouveau;
 }
-pA appelRechercheParentModifEquilibre(pA a, long id){
+pA appelRechercheParentModifEquilibre(pA a, int id){
     Pile * liste = malloc(sizeof(Pile));
     liste = creationPile(a);
     liste = rechercheParentModifEquilibre(id, liste);
@@ -160,7 +160,7 @@ pA appelRechercheParentModifEquilibre(pA a, long id){
     }
     return a;
 }
-Pile * rechercheParentModifEquilibre(long id, Pile* pile){ //dans le cas ou un element est egal a celui que l'on cree, on renvoie sa localisation, sinon c le futur parent.
+Pile * rechercheParentModifEquilibre(int id, Pile* pile){ //dans le cas ou un element est egal a celui que l'on cree, on renvoie sa localisation, sinon c le futur parent.
     if(!estVide(pile->arbre)){
         if(id < pile->arbre->elmt->station){
             if(!estVide(pile->arbre->fg)){
@@ -466,7 +466,7 @@ void traitementArbre(char *  nomdufichier, int info, int mod){
         // date/heure;variable\n
         //date/heure;moyenne\n
         //partie du principe que on peut comparer les dates comme si ils etaient des entiers en ascii, a verifier
-        int i = 0;
+        /*int i = 0;
         int nvldate;
         long date = 0;
         int utc = 0;
@@ -493,7 +493,7 @@ void traitementArbre(char *  nomdufichier, int info, int mod){
                 nvldate = fgetc(fichierEntree);
                 if (!(nvldate < '0'&& nvldate > '9')){
                     utc = utc * 10 + nvldate - 48;
-                    printf("utc : %i \n");
+                    printf("utc : %i \n",utc);
                 }
             }
             //voir atoi
@@ -514,7 +514,7 @@ void traitementArbre(char *  nomdufichier, int info, int mod){
                 //}
         }
           //boucle generale
-        /*while*/ if (! feof(fichierEntree)){ //boucle de creation de l'arbre
+        /*while if (! feof(fichierEntree)){ //boucle de creation de l'arbre
             tmp = malloc(sizeof(Elmt));
             printf("entree dans ma boucle\n");
             //modifs a mettre ici pour convertir la date en entier
@@ -560,7 +560,7 @@ void traitementArbre(char *  nomdufichier, int info, int mod){
                     //printf("ok jusqu'ici \n");
                 //}
             //}
-        }
+        }*/
     }
     if(mod == 3){ //boucle pour le tri 3
         //format: entree puis sortie
@@ -588,18 +588,22 @@ void traitementArbre(char *  nomdufichier, int info, int mod){
                             if (a != '\n' && a != ' '){
                                 fseek(fichierEntree,SEEK_CUR,-1);
                                 fscanf(fichierEntree, "%f", &elmt1->min);//latitude
-                                if (a != '\n' && a != ' '){
-                                    fseek(fichierEntree,SEEK_CUR,-1);
-                                    fscanf(fichierEntree, "%f", &elmt1->somme);//direction vent
-                                    a = fgetc(fichierEntree);//passe le separateur
-                                    if(a != '\n' && a != ' '){ 
-                                        a = fgetc(fichierEntree); 
-                                        if (a != '\n' && a != ' '){
-                                            fseek(fichierEntree,SEEK_CUR,-1);
-                                            fscanf(fichierEntree, "%f", &elmt1->somme2);//intensite vent
-                                            elmt1->nbelmt = 1;
-                                            elmt1->nbelmt2 = 1;
-                                            arbre->elmt = elmt1;
+                                a = fgetc(fichierEntree);//passe le separateur
+                                if(a != '\n' && a != ' '){ 
+                                    a = fgetc(fichierEntree); 
+                                    if (a != '\n' && a != ' '){
+                                        fseek(fichierEntree,SEEK_CUR,-1);
+                                        fscanf(fichierEntree, "%f", &elmt1->somme);//direction vent
+                                        a = fgetc(fichierEntree);//passe le separateur
+                                        if(a != '\n' && a != ' '){ 
+                                            a = fgetc(fichierEntree); 
+                                            if (a != '\n' && a != ' '){
+                                                fseek(fichierEntree,SEEK_CUR,-1);
+                                                fscanf(fichierEntree, "%f", &elmt1->somme2);//intensite vent
+                                                elmt1->nbelmt = 1;
+                                                elmt1->nbelmt2 = 1;
+                                                arbre->elmt = elmt1;
+                                            }
                                         }
                                     }
                                 }
@@ -627,10 +631,12 @@ void traitementArbre(char *  nomdufichier, int info, int mod){
                             if (a != '\n' && a != ' '){
                                 fseek(fichierEntree,SEEK_CUR,-1);
                                 fscanf(fichierEntree, "%f", &tmp->min);//latitude
+                                a=fgetc(fichierEntree);//passe le separateur
                                 if (a != '\n' && a != ' '){
+                                    a=fgetc(fichierEntree);
                                     fseek(fichierEntree,SEEK_CUR,-1);
                                     fscanf(fichierEntree, "%f", &tmp->somme);//direction vent
-                                    printf("%d\n", tmp->somme);
+                                    printf("%f\n", tmp->somme);
                                     a = fgetc(fichierEntree);//passe le separateur
                                     if(a != '\n' && a != ' '){ 
                                         a = fgetc(fichierEntree); 

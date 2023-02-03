@@ -37,8 +37,8 @@ type min(type a, type b);
 //fonctions pour les arbres
 int estVide(pA a);
 int descendance(pA a);
-pA rechercheParentCreation(pA a, long id);
-//pA rechercheParent(pA a, long id);
+pA rechercheParentCreation(pA a, int id);
+//pA rechercheParent(pA a, int id);
 pA creationArbre(pA a, Elmt* elm, int info, int mod);
 //pA creationFils (pA papa, pA enfant, int info);
 int profondeurDescendance (pA a);
@@ -53,8 +53,8 @@ pA rotationSD(pA arbre);
 pA rotationGD(pA arbre);
 void calculEquilibre (pA a);
 pA verifEquilibre (pA a);
-pA appelRechercheParentModifEquilibre(pA a, long id);
-Pile * rechercheParentModifEquilibre(long id, Pile* pile);
+pA appelRechercheParentModifEquilibre(pA a, int id);
+Pile * rechercheParentModifEquilibre(int id, Pile* pile);
 
 
 void traitementArbre(char* nomdufichier, int info, int mod);
