@@ -515,7 +515,8 @@ case $M in
     4)
     cp ValeursRetours.csv gnuplot/
     cd gnuplot 
-    gnuplot vecteur.gnu --persist --slow
+    #echo "mode vents"
+	gnuplot vecteur.gnu --persist --slow
     mv Vecteur.png ../Data/Graphique$var$Lieu.png
     cd ..
     ;;
@@ -523,11 +524,7 @@ case $M in
 
 
     5)
-    if [ ! -z "$h" ]
-    then
-        awk -F";" ' {print $1";"$3";"$2} ' ValeursRetours.csv > ValeursRetours2.csv
-        mv ValeursRetours2.csv ValeursRetours.csv 
-    fi
+
     cp ValeursRetours.csv gnuplot/
     cd gnuplot 
     gnuplot CarteInter.gnu --persist --slow 
